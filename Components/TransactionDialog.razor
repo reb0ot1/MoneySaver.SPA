@@ -1,0 +1,52 @@
+﻿@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="exampleModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleLabel">Transaction</h5>
+                    <button type="button" class="close" @onclick="@Close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+               
+                <EditForm Model="@Transaction" OnValidSubmit="@HandleValidSubmit">
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="form-group">
+                            <label for="">Transaction date: </label>
+                            <InputDate id="transactionDate" class="form-control" @bind-Value="@Transaction.TransactionDate">
+                            </InputDate>
+                            @*<RadzenDatePicker @bind-Value="@Transaction.TransactionDate" DateFormat="MM yyyy"  />*@
+                            <ValidationMessage For="@(() => Transaction.TransactionDate)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="transactionCategory" class="col-sm-3">Category: </label>
+                            <InputSelect id="transactionCategory" class="form-control col-sm-8" @bind-Value="@CategoryId">
+                                @foreach (var category in TransactionCategories)
+                                    {
+                                    <option value="@category.TransactionCategoryId">@category.AlternativeName</option>
+                                    }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Amount: </label>
+                            <InputNumber id="amount" class="form-control" @bind-Value="@Transaction.Amount"></InputNumber>
+                            <ValidationMessage For="@(() => Transaction.Amount)" />
+                        </div>
+                        <div class="form-group">
+                            <label for="">AdditionalNote: </label>
+                            <InputTextArea id="additionalNote" class="form-control" @bind-Value="@Transaction.AdditionalNote" placeholder="Additional info"></InputTextArea>
+                            <ValidationMessage For="@(() => Transaction.AdditionalNote)" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save transaction</button>
+                        <a class="btn btn-outline-primary" @onclick="@Close">Close</a>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}

@@ -1,0 +1,73 @@
+﻿@page "/configuration"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using MoneySaver.SPA.Components
+@using MoneySaver.SPA.Models;
+@using Radzen.Blazor
+<div class="container">
+    <h3>Configuration</h3>
+    @if (Categories == null)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <CategoryDialog @ref="CategoryDialog" CloseEventCallback="@OnDialogClose"></CategoryDialog>
+        <div class="col-md-12">
+            <button type="button" class="btn btn-info" @onclick="@(() => AddItem())">
+                <i class="fas fa-plus"></i>Add category
+            </button>
+        </div>
+
+        <div class="row my-5" style="margin-bottom:16px">
+            <div class="col-lg-12">
+                @*<RadzenCard>*@
+                    <RadzenTree Expand=@OnExpand Change=@OnChange Data=@Categories Style="width: 100%">
+                    <RadzenTreeLevel TextProperty="Name" ChildrenProperty="Children" HasChildren="@(c => { var ch = c as TransactionCategory; return ch.Children.Count() > 0; })">
+                    <Template>
+                        <div class="row">
+                            <div>@((context.Value as TransactionCategory).Name)
+                                <button type="button" class="btn btn-info btn-sm" @onclick="@(() => AddItem((context.Value as TransactionCategory)))">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => EditItem((context.Value as TransactionCategory)))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteItem((context.Value as TransactionCategory)))">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @*<button type="button" class="btn btn-danger btn-sm" @onclick="@(() => AddItem((context.Value as TransactionCategory)))">
+                                <i class="fas fa-trash fa-xs" @onclick="@(() => AddItem((context.Value as TransactionCategory)))"></i>
+                            </button>*@
+                    </Template>
+                </RadzenTreeLevel>
+                <RadzenTreeLevel TextProperty="Name" HasChildren=@(category => false)>
+                    <Template>
+                        <div class="row">
+                            <div>
+                                @((context.Value as TransactionCategory).Name)
+                                <button type="button" class="btn btn-primary btn-sm" @onclick="@(() => EditItem((context.Value as TransactionCategory)))">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="@(() => DeleteItem((context.Value as TransactionCategory)))">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @*<button type="button" class="btn btn-danger btn-sm" @onclick="@(() => AddItem((context.Value as TransactionCategory)))">
+                                <i class="fas fa-trash"></i>
+                            </button>*@
+                    </Template>
+                </RadzenTreeLevel>
+            </RadzenTree>
+                @*</RadzenCard>*@
+            </div>
+        </div>
+    }
+</div>

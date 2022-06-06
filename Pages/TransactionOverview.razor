@@ -1,0 +1,52 @@
+﻿@page "/transactions"
+@using System.Linq
+@using Microsoft.AspNetCore.Authorization
+@using Radzen.Blazor
+@attribute [Authorize]
+<h3>Transactions</h3>
+@if (Transactions == null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <button @onclick="AddTransaction" class="btn btn-info table-btn"><i class="fas fa-plus" /> Add transaction</button>
+
+   if (!Transactions.Any())
+   {
+        <div>No data</div>
+   }
+   else
+   {
+        <RadzenGrid AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadData"
+                    AllowSorting="true" Data="@Transactions" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Transaction" ColumnWidth="200px">
+            <Columns>
+                <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">
+                    <Template Context="data">
+                        @data.TransactionDate.ToString("dd/MM/yyyy")
+                    </Template>
+                </RadzenGridColumn>
+                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="TransactionCategoryId" Title="Category" Filterable="false" Sortable="false">
+                        <Template Context="data">
+                            @TransactionCategories.First(e => e.TransactionCategoryId == data.TransactionCategoryId).AlternativeName
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="Amount" Title="Amount" />
+                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
+                    <RadzenGridColumn Width="80px" TItem="MoneySaver.SPA.Models.Transaction" Title="" Filterable="false" Sortable="false">
+                        <Template Context="transaction">
+                            @*<button type="button" class="btn btn-primary" @onclick="@(() => UpdateTransaction(transaction.Id))"><i class="fas fa-edit"></i></button>*@
+                            <RadzenButton Click="@((args) => UpdateTransaction(transaction.Id))" Icon="edit" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+                            <RadzenButton Click="@((args) => DeleteOperation(transaction.Id))" Icon="close" ButtonStyle="Radzen.ButtonStyle.Danger" />
+                        </Template>
+                    </RadzenGridColumn>
+            </Columns>
+        </RadzenGrid>
+   }
+    <TransactionDialog @ref="TransactionDialog" CloseEventCallback="@OnDialogClose" TransactionCategories="@TransactionCategories.ToArray()"></TransactionDialog>
+    <ConfirmationDialog @ref="ConfirmationDialog" CloseEventCallback="@OnDialogClose" ProceedEventCallback="@DeleteTransaction" />
+}

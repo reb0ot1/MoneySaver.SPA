@@ -1,0 +1,54 @@
+﻿@page "/report"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+<h3>Report</h3>
+<div class="row my-5">
+    <EditForm Model="@Filter" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-row col-lg-12">
+        <div class="form-group col-lg-4 col-sm-12">
+            <label for="">From: </label>
+            <InputDate id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From"></InputDate>
+            <ValidationMessage For="@(() => Filter.From)" />
+        </div>
+        <div class="form-group col-lg-4 col-sm-12">
+            <label for="">To: </label>
+            <InputDate id="transactionDateTo" class="form-control" @bind-Value="@Filter.To"></InputDate>
+            <ValidationMessage For="@(() => Filter.To)" />
+        </div>
+        <div class="form-group col-lg-4 col-sm-12">
+            <button type="submit" class="btn btn-primary" style="margin-top:25px">Apply</button>
+        </div>
+    </div>
+</EditForm>
+</div>
+<div class="row">
+    @if (Data == null)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-body">
+                    <PieChart @ref="PieChart" Data="@Data" Total="@Data.Sum(e => e.Amount)" ChartName="Expenses" ChartContainer="expensesChart" />
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="card">
+                <div class="card-body">
+                    <LineChart @ref="LineChart" Data="@LineChartData" ChartName="Expenses by period (1 year)" ChartContainer="lineChart" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
