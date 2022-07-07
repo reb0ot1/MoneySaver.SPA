@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  moneysaver.api:
+    image: moneysaver-api
+    container_name: moneysaver-api-container
+    build:
+      context: ./MoneySaver.Api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${HTTP_PORT_API}:80"
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,3433;Database=MoneySaver;User Id=sa;Password=Pass@word;Integrated Security=False;MultipleActiveResultSets=true
+    # environment:
+    #   - ASPNETCORE_ENVIRONMENT=Development
+    #   - ASPNETCORE_URLS=https://+;http://+&quot;
+    #   - ASPNETCORE_Kestrel__Certificates__Default__Password=awdzs123
+    #   - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/localhost.pfx
+    # for server setup
+    #  volumes:
+    #    - /etc/letsencrypt/live/moneyroutes.eu-0001/bundle.pfx :/https
+    networks:
+      - moneysavernet
+  
+  moneysaver.identity:
+    image: moneysaver-identity
+    container_name: moneysaver-identity-container
+    build:
+      context: ./MoneySaver.Identity
+      dockerfile: Dockerfile
+    ports:
+      - "${HTTP_PORT_IDENTITY}:80"
+    # for server setup
+    #  volumes:
+    #    - /etc/letsencrypt/live/moneyroutes.eu-0001/bundle.pfx :/https
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,3433;Database=MoneySaver.Identity;User Id=sa;Password=Pass@word;Integrated Security=False;MultipleActiveResultSets=true
+    networks:
+      - moneysavernet
+
+  moneysaver.spa:
+    image: moneysaver-spa
+    container_name: moneysaver-spa-container
+    build:
+      context: ./MoneySaver.SPA
+      dockerfile: Dockerfile
+    ports:
+      - "${HTTP_PORT_SPA}:80"
+    networks:
+      - moneysavernet
+
+  mssql:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    container_name: sqlserver2019-latest
+    env_file:
+      - .env
+    ports:
+      - "3433:1433"
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "MSSQL_SA_PASSWORD=Pass@word"
+    volumes:
+      - mssqlstore:/var/opt/mssql
+    networks:
+      - moneysavernet
+    # working_dir: /usr/src/app
+    restart: always
+
+volumes:
+  mssqlstore:
+    external: true
+
+networks:
+  moneysavernet:
+    external: true
