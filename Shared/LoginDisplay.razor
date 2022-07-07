@@ -9,7 +9,7 @@
     </Authorizing>
     <Authorized>
         Logged as: @context.User.Claims.Where(e => e.Type == "name" || e.Type ==  ClaimTypes.Name ).FirstOrDefault()?.Value
-        <a href="login">Log out</a>
+        <a href="logout">Log out</a>
         @*<button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>*@
     </Authorized>
     <NotAuthorized>

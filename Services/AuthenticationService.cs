@@ -29,7 +29,7 @@ namespace MoneySaver.SPA.Services
         {
             var content = JsonSerializer.Serialize(userForAuthenticationDto);
             var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
-            var baseUri = new Uri("http://localhost:7000/");
+            var baseUri = new Uri("http://localhost:7098/");
             var myUri = new Uri(baseUri, "login");
             var authResult = await this._client.PostAsync(myUri, bodyContent);
             var authContent = await authResult.Content.ReadAsStringAsync();
@@ -61,10 +61,5 @@ namespace MoneySaver.SPA.Services
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _client.DefaultRequestHeaders.Authorization = null;
         }
-
-        //public Task<RegistrationResponseDto> RegisterUser(UserForRegistrationDto userForRegistration)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }
