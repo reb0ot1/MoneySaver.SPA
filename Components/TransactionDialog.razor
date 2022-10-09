@@ -16,9 +16,7 @@
                         <ValidationSummary />
                         <div class="form-group">
                             <label for="">Transaction date: </label>
-                            <InputDate id="transactionDate" class="form-control" @bind-Value="@Transaction.TransactionDate">
-                            </InputDate>
-                            @*<RadzenDatePicker @bind-Value="@Transaction.TransactionDate" DateFormat="MM yyyy"  />*@
+                            <RadzenDatePicker id="transactionDate" class="form-control" @bind-Value="@Transaction.TransactionDate" DateFormat="@Constants.DATE_FORMAT" />
                             <ValidationMessage For="@(() => Transaction.TransactionDate)" />
                         </div>
                         <div class="form-group">

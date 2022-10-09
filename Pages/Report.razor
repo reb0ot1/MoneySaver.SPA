@@ -10,12 +10,14 @@
     <div class="form-row col-lg-12">
         <div class="form-group col-lg-4 col-sm-12">
             <label for="">From: </label>
-            <InputDate id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From"></InputDate>
+            @*<InputDate id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From"></InputDate>*@
+                <RadzenDatePicker id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From" DateFormat="@Constants.DATE_FORMAT" />
             <ValidationMessage For="@(() => Filter.From)" />
         </div>
         <div class="form-group col-lg-4 col-sm-12">
             <label for="">To: </label>
-            <InputDate id="transactionDateTo" class="form-control" @bind-Value="@Filter.To"></InputDate>
+            @*<InputDate id="transactionDateTo" class="form-control" @bind-Value="@Filter.To"></InputDate>*@
+                <RadzenDatePicker id="transactionDateTo" class="form-control" @bind-Value="@Filter.To" DateFormat="@Constants.DATE_FORMAT" />
             <ValidationMessage For="@(() => Filter.To)" />
         </div>
         <div class="form-group col-lg-4 col-sm-12">

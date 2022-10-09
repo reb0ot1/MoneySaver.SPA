@@ -27,7 +27,7 @@ else
             <Columns>
                 <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">
                     <Template Context="data">
-                        @data.TransactionDate.ToString("dd/MM/yyyy")
+                        @data.TransactionDate.ToString(Constants.DATE_FORMAT)
                     </Template>
                 </RadzenGridColumn>
                     <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="TransactionCategoryId" Title="Category" Filterable="false" Sortable="false">
@@ -39,7 +39,6 @@ else
                     <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
                     <RadzenGridColumn Width="80px" TItem="MoneySaver.SPA.Models.Transaction" Title="" Filterable="false" Sortable="false">
                         <Template Context="transaction">
-                            @*<button type="button" class="btn btn-primary" @onclick="@(() => UpdateTransaction(transaction.Id))"><i class="fas fa-edit"></i></button>*@
                             <RadzenButton Click="@((args) => UpdateTransaction(transaction.Id))" Icon="edit" ButtonStyle="Radzen.ButtonStyle.Secondary" />
                             <RadzenButton Click="@((args) => DeleteOperation(transaction.Id))" Icon="close" ButtonStyle="Radzen.ButtonStyle.Danger" />
                         </Template>
