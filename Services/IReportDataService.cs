@@ -1,9 +1,5 @@
 ﻿using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
@@ -12,5 +8,7 @@ namespace MoneySaver.SPA.Services
         Task<List<DataItem>> GetExpensesPerCategoryAsync(FilterModel filter);
 
         Task<LineChartDataModel> GetExpensesPerMonth(FilterModel filter);
+
+        Task<LineChartDataModel> GetExpensesByPeriodPerCategoryAsync(FilterModel filter);
     }
 }

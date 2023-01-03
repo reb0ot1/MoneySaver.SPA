@@ -1,13 +1,9 @@
-﻿using MoneySaver.SPA.Models;
+﻿using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
@@ -16,9 +12,9 @@ namespace MoneySaver.SPA.Services
         private HttpClient httpClient;
         private Uri uri;
 
-        public CategoryService(HttpClient httpClient, DataApi dataApi)
+        public CategoryService(HttpClient httpClient, IOptions<SpaSettings> spaSettingConfiguration)
         {
-            this.uri = new Uri(dataApi.Url);
+            this.uri = new Uri(spaSettingConfiguration.Value.DataApiAddress);
             this.httpClient = httpClient;
         }
 
@@ -42,6 +38,31 @@ namespace MoneySaver.SPA.Services
             result = await httpClient.GetFromJsonAsync<IEnumerable<TransactionCategory>>(new Uri(this.uri, "api/category"));
 
             return result;
+        }
+
+        public async Task<IEnumerable<TransactionCategory>> GetAllPreparedForVisualizationAsync()
+        {
+            var resultDb = await this.GetAllAsync();
+            var parentTransactionCategoryModels = resultDb
+                .Where(w => w.ParentId == null);
+
+            foreach (var parentCategory in parentTransactionCategoryModels)
+            {
+                var children = resultDb
+                    .Where(w => w.ParentId == parentCategory.TransactionCategoryId)
+                    .ToList();
+                if (children.Any())
+                {
+                    foreach (var item in children)
+                    {
+                        item.AlternativeName = $"{parentCategory.Name}, {item.Name}";
+                    }
+                }
+
+                parentCategory.AlternativeName = parentCategory.Name;
+            }
+
+            return resultDb.OrderBy(e => e.AlternativeName).ToList();
         }
 
         public async Task UpdateCategory(TransactionCategory category)

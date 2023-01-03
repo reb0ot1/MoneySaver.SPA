@@ -15,14 +15,16 @@
 else
 {
     <button @onclick="AddTransaction" class="btn btn-info table-btn"><i class="fas fa-plus" /> Add transaction</button>
-
+    <div style="float:right"><input style="margin:5px" type="text" @onchange="OnValueChange" /><i class="fas fa-search"></i></div>
+    @*<RadzenTextBox @oninput="OnValueChange" Class="w-100" />*@
+    
    if (!Transactions.Any())
    {
         <div>No data</div>
    }
    else
    {
-        <RadzenGrid AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadData"
+        <RadzenGrid @ref="grid" AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadGridData"
                     AllowSorting="true" Data="@Transactions" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Transaction" ColumnWidth="200px">
             <Columns>
                 <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">

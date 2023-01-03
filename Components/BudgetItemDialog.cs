@@ -7,6 +7,9 @@ namespace MoneySaver.SPA.Components
     public partial class BudgetItemDialog
     {
         private bool forUpdate = false;
+
+        private BudgetItemModel OriginalBudgetItem = null;
+
         public BudgetItemModel BudgetItemModel { get; set; }
 
         [Inject]
@@ -36,18 +39,30 @@ namespace MoneySaver.SPA.Components
 
             ShowDialog = false;
             await CloseEventCallback.InvokeAsync(true);
-            //StateHasChanged();
         }
 
         public void Show(BudgetItemModel model = null)
         {
-            ResetDialog();
             if (model != null)
             {
-                CategoryId = model.TransactionCategoryId.ToString();
+                this.CategoryId = model.TransactionCategoryId.ToString();
                 this.BudgetItemModel = model;
                 this.forUpdate = true;
             }
+            else
+            {
+                var defaultCategory = this.ТransactionCategories.First();
+                this.BudgetItemModel = new BudgetItemModel
+                {
+                    TransactionCategoryId = (int)defaultCategory.TransactionCategoryId,
+                    LimitAmount = 0
+                };
+            }
+            this.OriginalBudgetItem = new BudgetItemModel
+            {
+                TransactionCategoryId = this.BudgetItemModel.TransactionCategoryId,
+                LimitAmount = this.BudgetItemModel.LimitAmount
+            };
 
             this.ShowDialog = true;
             StateHasChanged();
@@ -55,20 +70,19 @@ namespace MoneySaver.SPA.Components
 
         public void Close()
         {
-            ResetDialog();
-            this.ShowDialog = false;
+            this.BudgetItemModel.TransactionCategoryId = this.OriginalBudgetItem.TransactionCategoryId;
+            this.BudgetItemModel.LimitAmount = this.OriginalBudgetItem.LimitAmount;
+            this.CategoryId = this.OriginalBudgetItem.TransactionCategoryId.ToString();
             StateHasChanged();
+            this.ShowDialog = false;
         }
 
         private void ResetDialog()
         {
             var defaultCategory = this.ТransactionCategories.First();
             this.forUpdate = false;
-            this.BudgetItemModel = new BudgetItemModel
-            {
-                TransactionCategoryId = (int)defaultCategory.TransactionCategoryId,
-                LimitAmount = 0
-            };
+            this.BudgetItemModel.TransactionCategoryId = (int)defaultCategory.TransactionCategoryId;
+            this.BudgetItemModel.LimitAmount = 0;
             this.CategoryId = defaultCategory.TransactionCategoryId.ToString();
         }
     }

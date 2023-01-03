@@ -15,5 +15,10 @@ namespace MoneySaver.SPA.Models
         public double Amount { get; set; }
 
         public string AdditionalNote { get; set; }
+
+        public Transaction Copy()
+        {
+            return this.MemberwiseClone() as Transaction;
+        }
     }
 }

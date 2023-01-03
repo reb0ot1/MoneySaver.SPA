@@ -1,15 +1,10 @@
-﻿using MoneySaver.SPA.Models;
+﻿using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
 using MoneySaver.SPA.Models.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
@@ -18,9 +13,9 @@ namespace MoneySaver.SPA.Services
         private HttpClient httpClient;
         private Uri uri;
 
-        public ReportsDataService(HttpClient httpClient, DataApi dataApi)
+        public ReportsDataService(HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
         {
-            this.uri = new Uri(dataApi.Url);
+            this.uri = new Uri(spaSettingsConfiguration.Value.DataApiAddress);
             this.httpClient = httpClient;
         }
 
@@ -43,6 +38,27 @@ namespace MoneySaver.SPA.Services
 
             return result;
         }
+
+        public async Task<LineChartDataModel> GetExpensesByPeriodPerCategoryAsync(FilterModel filter)
+        {
+            var uri = new Uri(this.uri, "api/reports/expensesbycategories");
+            var result = new LineChartDataModel();
+            var filterJson = new StringContent(
+                JsonSerializer.Serialize(filter),
+                Encoding.UTF8, "application/json"
+                );
+
+            var response = await this.httpClient.PostAsync(uri, filterJson);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseResult = await response.Content.ReadFromJsonAsync<LineChartDataModel>();
+                result = responseResult;
+            }
+
+            return result;
+        }
+
         public async Task<LineChartDataModel> GetExpensesPerMonth(FilterModel filter)
         {
             var uri = new Uri(this.uri, "api/reports/expensesperiod");

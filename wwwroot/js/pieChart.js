@@ -13,9 +13,6 @@
                 },
 
                 accessibility: {
-                    announceNewData: {
-                        enabled: true
-                    },
                     point: {
                         valueSuffix: '%'
                     }
@@ -28,7 +25,7 @@
                         dataLabels: {
                             enabled: false
                         },
-                        showInLegend: true
+                        showInLegend: false
                     }
                 },
 

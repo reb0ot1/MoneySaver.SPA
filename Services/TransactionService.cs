@@ -1,11 +1,8 @@
-﻿using MoneySaver.SPA.Models;
+﻿using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
@@ -15,25 +12,16 @@ namespace MoneySaver.SPA.Services
         //TODO: Change HttpClient with httpClientFactory
         private HttpClient httpClient { get; set; }
 
-        public TransactionService(HttpClient httpClient, DataApi dataApi)
+        public TransactionService(HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
         {
             this.httpClient = httpClient;
-            this.baseUrl = dataApi.Url + "api/transaction";
+            this.baseUrl = spaSettingsConfiguration.Value.DataApiAddress + "api/transaction";
         }
 
-        public async Task<IEnumerable<Transaction>> GetAllAsync()
-        {
-            IEnumerable<Transaction> result = new List<Transaction>();
-            result = await httpClient
-                .GetFromJsonAsync<IEnumerable<Transaction>>(baseUrl);
-
-            return result;
-        }
-
-        public async Task<TransactionsPageModel> GetForPage(int itemsToSkip, int itemsPerPage)
+        public async Task<TransactionsPageModel> GetForPage(int itemsToSkip, int itemsPerPage, string search)
         {
             var transactionJson = new StringContent(
-                JsonSerializer.Serialize(new { ItemsToSkip = itemsToSkip, ItemsPerPage = itemsPerPage}),
+                JsonSerializer.Serialize(new { ItemsToSkip = itemsToSkip, ItemsPerPage = itemsPerPage, Filter = new { SearchText = search } }),
                 Encoding.UTF8, "application/json"
                 );
 

@@ -3,12 +3,15 @@ using MoneySaver.SPA.Models;
 using Microsoft.AspNetCore.Components;
 using MoneySaver.SPA.Services;
 using Radzen;
+using Radzen.Blazor;
 
 namespace MoneySaver.SPA.Pages
 {
     public partial class TransactionOverview
     {
         protected const int ItemsPerPage = 50;
+
+        protected RadzenGrid<Transaction> grid;
 
         public IEnumerable<Transaction> Transactions { get; set; }
 
@@ -24,23 +27,28 @@ namespace MoneySaver.SPA.Pages
 
         public int SkipedItems { get; set; } = 0;
 
-        public async Task LoadData(LoadDataArgs args)
-        {
-            var skip = args.Skip ?? 0;
-            this.SkipedItems = skip;
-            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage);
-            this.TotalCount = pageResult.TotalCount;
-            Transactions = pageResult.Result;
-        }
+        public string Search { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
-            var result = await CategoryService.GetAllAsync();
-            TransactionCategories = this.PrepareForVisualization(result);
+            TransactionCategories = await CategoryService.GetAllPreparedForVisualizationAsync();
 
-            var pageResult = await this.TransactionService.GetForPage(0, ItemsPerPage);
-            this.TotalCount = pageResult.TotalCount;
-            this.Transactions = pageResult.Result;
+            await this.ManageGridData();
+        }
+
+        public async Task LoadGridData(LoadDataArgs args)
+        {
+            this.SkipedItems = args.Skip ?? 0;
+            await this.ManageGridData();
+        }
+
+        public async void OnValueChange(ChangeEventArgs e)
+        {
+            this.SkipedItems = 0;
+            this.Search = e.Value.ToString();
+            await grid.FirstPage();
+            await ManageGridData();
+            await InvokeAsync(StateHasChanged);
         }
 
         protected TransactionDialog TransactionDialog { get; set; }
@@ -70,36 +78,17 @@ namespace MoneySaver.SPA.Pages
 
         public async Task OnDialogClose(bool result)
         {
-            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage);
+            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage, null);
             this.TotalCount = pageResult.TotalCount;
             Transactions = pageResult.Result;
             StateHasChanged();
         }
 
-        //TODO: This logic should be moved to the API ???
-        private IEnumerable<TransactionCategory> PrepareForVisualization(IEnumerable<TransactionCategory> categories)
+        private async Task ManageGridData()
         {
-            var result = new List<TransactionCategory>();
-            var parentTransactionCategoryModels = categories
-                .Where(w => w.ParentId == null);
-
-            foreach (var parentCategory in parentTransactionCategoryModels)
-            {
-                var children = categories
-                    .Where(w => w.ParentId == parentCategory.TransactionCategoryId)
-                    .ToList();
-                if (children.Any())
-                {
-                    foreach (var item in children)
-                    {
-                        item.AlternativeName = $"{parentCategory.Name}, {item.Name}";
-                    }
-                }
-
-                parentCategory.AlternativeName = parentCategory.Name;
-            }
-
-            return categories.OrderBy(e => e.AlternativeName).ToList();
+            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage, this.Search);
+            this.TotalCount = pageResult.TotalCount;
+            this.Transactions = pageResult.Result;
         }
     }
 }

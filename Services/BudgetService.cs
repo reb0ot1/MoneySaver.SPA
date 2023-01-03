@@ -1,11 +1,9 @@
-﻿using MoneySaver.SPA.Models;
+﻿using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
-using System;
-using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
@@ -14,9 +12,9 @@ namespace MoneySaver.SPA.Services
         private HttpClient httpClient;
         private Uri uri;
         private const string BaseApiPath = "api/budget";
-        public BudgetService(HttpClient httpClient, DataApi dataApi)
+        public BudgetService(HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
         {
-            this.uri = new Uri(dataApi.Url);
+            this.uri = new Uri(spaSettingsConfiguration.Value.DataApiAddress);
             this.httpClient = httpClient;
         }
         public async Task<BudgetModel> GetBudgetByTimeType(int intType)

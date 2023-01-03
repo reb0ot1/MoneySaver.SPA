@@ -7,6 +7,7 @@ namespace MoneySaver.SPA.Components
     public partial class CategoryDialog
     {
         private bool forUpdate = false;
+        private string originalCategoryName = null;
 
         [Inject]
         public ICategoryService CategoryService { get; set; }
@@ -23,7 +24,6 @@ namespace MoneySaver.SPA.Components
         protected async Task HandleValidSubmit()
         {
             ShowDialog = false;
-            
             if (!this.forUpdate)
             {
                 //TODO: Add new child/parent category
@@ -41,14 +41,16 @@ namespace MoneySaver.SPA.Components
 
         public void Show(TransactionCategory category = null)
         {
-            ResetDialog();
             if (category != null)
             {
                 this.Category = category;
-                if (category.TransactionCategoryId != null)
-                {
-                    this.forUpdate = true;
-                }
+                this.originalCategoryName = category.Name;
+                this.forUpdate = true;
+            }
+            else 
+            {
+                this.Category = new TransactionCategory();
+                this.forUpdate = false;
             }
 
             this.ShowDialog = true;
@@ -58,14 +60,8 @@ namespace MoneySaver.SPA.Components
         public void Close()
         {
             this.ShowDialog = false;
+            this.Category.Name = this.originalCategoryName??string.Empty;
             StateHasChanged();
         }
-
-        private void ResetDialog()
-        {
-            this.Category = new TransactionCategory();
-            this.forUpdate = false;
-        }
-
     }
 }

@@ -1,18 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MoneySaver.SPA.Models;
-using MoneySaver.SPA.Pages;
 using MoneySaver.SPA.Services;
 namespace MoneySaver.SPA.Components
 {
     public partial class TransactionDialog
     {
         private bool forUpdate = false;
+        private Transaction originalTransaction = null;
         public Transaction Transaction { get; set; }
-            = new Transaction
-            {
-                Id = Guid.NewGuid(),
-                TransactionDate = DateTime.Now,
-            };
 
         public bool ShowDialog { get; set; }
 
@@ -32,18 +27,21 @@ namespace MoneySaver.SPA.Components
 
         public void Show(Transaction transaction = null)
         {
-            ResetDialog();
             if (transaction != null)
             {
                 this.Transaction = transaction;
+                this.originalTransaction = this.Transaction.Copy();
                 this.CategoryId = transaction.TransactionCategoryId.ToString();
                 this.forUpdate = true;
             }
             else
             {
-                this.CategoryId = this.TransactionCategories
-                .First().TransactionCategoryId
-                .ToString();
+                this.Transaction = new Transaction
+                {
+                    TransactionDate = DateTime.UtcNow
+                };
+
+                this.CategoryId = this.TransactionCategories.First().TransactionCategoryId.ToString();
                 this.forUpdate = false;
             }
             
@@ -53,20 +51,17 @@ namespace MoneySaver.SPA.Components
 
         public void Close()
         {
+            if (this.forUpdate)
+            {
+                this.Transaction.Amount = this.originalTransaction.Amount;
+                this.Transaction.TransactionDate = this.originalTransaction.TransactionDate;
+                this.Transaction.TransactionCategoryId = this.originalTransaction.TransactionCategoryId;
+                this.Transaction.AdditionalNote = this.originalTransaction.AdditionalNote;
+                this.CategoryId = this.originalTransaction.TransactionCategoryId.ToString();
+            }
+            
             this.ShowDialog = false;
             StateHasChanged();
-        }
-
-        private void ResetDialog()
-        {
-            this.CategoryId = default;
-            this.Transaction = new Transaction
-            {
-                Id = Guid.NewGuid(),
-                TransactionDate = DateTime.Now,
-                TransactionCategoryId = (int)TransactionCategories.First().TransactionCategoryId
-            };
-            this.forUpdate = false;
         }
 
         protected async Task HandleValidSubmit()
@@ -79,6 +74,7 @@ namespace MoneySaver.SPA.Components
             }
             else
             {
+                this.Transaction.Id = Guid.NewGuid();
                 await this.TransactionService.AddAsync(this.Transaction);
             }
             

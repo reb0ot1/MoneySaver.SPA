@@ -10,9 +10,12 @@ using MoneySaver.SPA.Services;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
-var dataApiConf = new DataApi();
-builder.Configuration.Bind(nameof(DataApi), dataApiConf);
-builder.Services.AddSingleton(dataApiConf);
+builder.Services.Configure<SpaSettings>(
+    builder.Configuration.GetSection(nameof(SpaSettings))
+    );
+//var spaSettings = new SpaSettings();
+//builder.Configuration.Bind(nameof(SpaSettings), spaSettings);
+//builder.Services.AddSingleton(spaSettings);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddAuthorizationCore();

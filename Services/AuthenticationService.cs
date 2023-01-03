@@ -1,7 +1,9 @@
 ﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Options;
 using MoneySaver.SPA.AuthProviders;
 using MoneySaver.SPA.Models;
+using MoneySaver.SPA.Models.Configurations;
 using System.Text;
 using System.Text.Json;
 
@@ -10,28 +12,32 @@ namespace MoneySaver.SPA.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly HttpClient _client;
-        private readonly JsonSerializerOptions _options;
+        //private readonly JsonSerializerOptions _options;
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILocalStorageService _localStorage;
+        private readonly string _identityAddress;
 
         public AuthenticationService(
             HttpClient client,
             AuthenticationStateProvider authenticationState,
-            ILocalStorageService localStorageService
+            ILocalStorageService localStorageService,
+            IOptions<SpaSettings> spaSettings
             )
         {
             this._client = client;
-            this._options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            //this._options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             this._authStateProvider = authenticationState;
             this._localStorage = localStorageService;
+            this._identityAddress = spaSettings.Value.AuthenticationAddress;
+
         }
         public async Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthenticationDto)
         {
             var content = JsonSerializer.Serialize(userForAuthenticationDto);
             var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
-            var baseUri = new Uri("http://localhost:7098/");
-            var myUri = new Uri(baseUri, "login");
-            var authResult = await this._client.PostAsync(myUri, bodyContent);
+            
+            var authUri = new Uri(new Uri(this._identityAddress), "login");
+            var authResult = await this._client.PostAsync(authUri, bodyContent);
             var authContent = await authResult.Content.ReadAsStringAsync();
 
             if (!authResult.IsSuccessStatusCode)

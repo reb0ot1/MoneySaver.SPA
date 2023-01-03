@@ -1,55 +1,82 @@
 ﻿@page "/report"
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Radzen
 @attribute [Authorize]
 <h3>Report</h3>
-<div class="row my-5">
-    <EditForm Model="@Filter" OnValidSubmit="@HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <div class="form-row col-lg-12">
-        <div class="form-group col-lg-4 col-sm-12">
-            <label for="">From: </label>
-            @*<InputDate id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From"></InputDate>*@
-                <RadzenDatePicker id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From" DateFormat="@Constants.DATE_FORMAT" />
-            <ValidationMessage For="@(() => Filter.From)" />
-        </div>
-        <div class="form-group col-lg-4 col-sm-12">
-            <label for="">To: </label>
-            @*<InputDate id="transactionDateTo" class="form-control" @bind-Value="@Filter.To"></InputDate>*@
-                <RadzenDatePicker id="transactionDateTo" class="form-control" @bind-Value="@Filter.To" DateFormat="@Constants.DATE_FORMAT" />
-            <ValidationMessage For="@(() => Filter.To)" />
-        </div>
-        <div class="form-group col-lg-4 col-sm-12">
-            <button type="submit" class="btn btn-primary" style="margin-top:25px">Apply</button>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="col-2 float-end">
+                <RadzenPanelMenu>
+                    <RadzenPanelMenuItem Text="Filters">
+                        <div stype="position:absolute; margin: 10px" class="bg-light">
+                            <EditForm Model="@Filter" OnValidSubmit="@HandleValidSubmit">
+                                <div>
+                                    <label for="">From: </label><br />
+                                    @*<InputDate id="transactionDateFrom" class="form-control" @bind-Value="@Filter.From"></InputDate>*@
+                                    <RadzenDatePicker style="font-size:10px" id="transactionDateFrom" @bind-Value="@Filter.From" DateFormat="@Constants.DATE_FORMAT" />
+                                    @*<ValidationMessage For="@(() => Filter.From)" />*@
+                                </div>
+                                <div>
+                                    <label for="">To: </label><br />
+                                    @*<InputDate id="transactionDateTo" class="form-control" @bind-Value="@Filter.To"></InputDate>*@
+                                    <RadzenDatePicker id="transactionDateTo" @bind-Value="@Filter.To" DateFormat="@Constants.DATE_FORMAT" />
+                                </div>
+
+                                @*<ValidationMessage For="@(() => Filter.To)" />*@
+                                @*TODO: Add list box for selectable categories*@
+                                <div class="col-lg-4 col-sm-12">
+                                    <button type="submit" class="btn btn-primary" style="margin-top:25px">Apply</button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </RadzenPanelMenuItem>
+                </RadzenPanelMenu>
+            </div>
         </div>
     </div>
-</EditForm>
-</div>
-<div class="row">
     @if (Data == null)
-    {
-        <div class="d-flex justify-content-center">
-            <div class="spinner-border" role="status">
-                <span class="sr-only">Loading...</span>
+    { 
+        <div class="row">
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
         </div>
     }
     else
     {
-        <div class="col-sm-4">
-            <div class="card">
-                <div class="card-body">
-                    <PieChart @ref="PieChart" Data="@Data" Total="@Data.Sum(e => e.Amount)" ChartName="Expenses" ChartContainer="expensesChart" />
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="card">
+                    <div class="card-body">
+                        <PieChart @ref="PieChart" Data="@Data" Total="@Data.Sum(e => e.Amount)" ChartName="Expenses" ChartContainer="expensesChart" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="card">
+                    <div class="card-body">
+                        <LineChart @ref="LineChart" Data="@LineChartData" ChartName="Expenses" ChartContainer="lineChart" />
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-8">
+        <div class="row">
+            <div class="col-sm-12">
             <div class="card">
+                <div>
+                    <label for="">Categories: </label><br />
+                    <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@CategoryRecords @bind-Value=@CategoryIdsSelected
+                                TextProperty="AlternativeName" ValueProperty="TransactionCategoryId" DisabledProperty="Discontinued" Change=@(args => OnCategoryDropDownChange()) Class="w-100" />
+                </div>
                 <div class="card-body">
-                    <LineChart @ref="LineChart" Data="@LineChartData" ChartName="Expenses by period (1 year)" ChartContainer="lineChart" />
+                    <LineChart @ref="LineChartForExpesesByPeriodForCategory" Data="@ExpensesByPeriodForCategoriesChartData" ChartName="Expenses by period per category" ChartContainer="lineChart2" />
                 </div>
             </div>
+        </div>
         </div>
     }
 </div>
