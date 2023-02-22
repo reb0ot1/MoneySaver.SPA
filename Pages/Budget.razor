@@ -13,7 +13,9 @@
 }
 else
 {
-        <button @onclick="AddItem" class="btn btn-info table-btn"><i class="fas fa-plus" />Add budget item</button>
+    <div>StartDate: @BudgetModel.StartDate</div>
+    <div>EndDate: @BudgetModel.EndDate</div>
+    <button @onclick="AddItem" class="btn btn-info table-btn"><i class="fas fa-plus" />Add budget item</button>
     <div class="row">
         <div class="col-md-12">
             <RadzenGrid AllowFiltering="false" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="false"
@@ -80,8 +82,7 @@ else
             </RadzenGrid>
         </div>
 
-
-        <BudgetItemDialog @ref="BudgetItemDialog" CloseEventCallback="@AddItem_OnDialogClose" ТransactionCategories="@TransactionCategories.ToArray()"></BudgetItemDialog>
+            <BudgetItemDialog @ref="BudgetItemDialog" CloseEventCallback="@AddItem_OnDialogClose" BudgetId="@BudgetModel.Id" ТransactionCategories="@TransactionCategories.ToArray()"></BudgetItemDialog>
     </div>
 }
 </div>

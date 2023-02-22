@@ -14,13 +14,15 @@
 }
 else
 {
-    <button @onclick="AddTransaction" class="btn btn-info table-btn"><i class="fas fa-plus" /> Add transaction</button>
-    <div style="float:right"><input style="margin:5px" type="text" @onchange="OnValueChange" /><i class="fas fa-search"></i></div>
+    <div style="margin-bottom:10px">
+        <button @onclick="AddTransaction" class="btn btn-info table-btn"><i class="fas fa-plus" /> Add transaction</button>
+        <div style="float:right"><input style="margin:5px" type="text" @onchange="OnValueChange" /><i class="fas fa-search"></i></div>
+    </div>
     @*<RadzenTextBox @oninput="OnValueChange" Class="w-100" />*@
     
    if (!Transactions.Any())
    {
-        <div>No data</div>
+        <div><b>No transactions to display</b></div>
    }
    else
    {

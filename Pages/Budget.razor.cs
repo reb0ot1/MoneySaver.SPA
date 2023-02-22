@@ -23,6 +23,7 @@ namespace MoneySaver.SPA.Pages
 
         protected async override Task OnInitializedAsync()
         {
+            //TODO: Get budget type set in the appconfiguration
             await this.UpdateCompoment();
         }
 
@@ -47,7 +48,7 @@ namespace MoneySaver.SPA.Pages
 
         public async void RemoveItem(int id)
         {
-            await this.BudgetService.RemoveBudgetItem(id);
+            await this.BudgetService.RemoveBudgetItem(this.BudgetModel.Id, id);
             await this.UpdateCompoment();
             StateHasChanged();
         }
@@ -108,10 +109,15 @@ namespace MoneySaver.SPA.Pages
         private async Task UpdateCompoment()
         {
             var categories = await CategoryService.GetAllAsync();
+            if (!categories.Any())
+            {
+                return;
+            }
+
             TransactionCategories = this.PrepareForVisualization(categories);
 
-            var budgetItems = await BudgetService.GetBudgetByTimeType(2);
-            foreach (var item in budgetItems.BudgetItems)
+            var budgetEntity = await BudgetService.GetBudgetInUseItems();
+            foreach (var item in budgetEntity.BudgetItems)
             {
                 if (item != null)
                 {
@@ -120,12 +126,12 @@ namespace MoneySaver.SPA.Pages
                 }
             }
 
-            budgetItems.BudgetItems = budgetItems
+            budgetEntity.BudgetItems = budgetEntity
                                         .BudgetItems
                                         .OrderBy(o => o.TransactionCategory.AlternativeName)
                                         .ToArray();
 
-            BudgetModel = budgetItems;
+            BudgetModel = budgetEntity;
         }
     }
 }

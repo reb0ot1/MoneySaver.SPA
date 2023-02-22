@@ -14,6 +14,8 @@ namespace MoneySaver.SPA.Models
 
         public int TransactionCategoryId { get; set; }
 
+        public string TransactionCategoryName { get; set; }
+
         public TransactionCategory TransactionCategory { get; set; }
 
         public double LimitAmount { get; set; } = 0;

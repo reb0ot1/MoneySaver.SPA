@@ -4,16 +4,55 @@
 <AuthorizeView>
     <Authorized>
         <PageTitle>Index</PageTitle>
-
-        @*<h1>Hello, world!</h1>
-
-        <div class="alert alert-warning" role="alert">
-            Before authentication will function correctly, you must configure your provider details in <code>Program.cs</code>
-        </div>
-
-        Welcome to your new app.
-
-        <SurveyPrompt Title="How is Blazor working for you?" />*@
+        <h3>@Name</h3>
+        @*<div class="container">*@
+            <div class="row">
+                <div class="col-6">
+                <b>Top categories spent amount</b> (@this.StartDate.ToString(Constants.DATE_FORMAT) - @this.EndDate.ToString(Constants.DATE_FORMAT))
+                    @if (CategoriesSpentAmount.Any())
+                    {
+                        <ol class="list-group list-group-numbered">
+                            @foreach (var category in CategoriesSpentAmount)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        @category.Name
+                                    </div>
+                                <span><b>@category.Amount</b></span>
+                                    @*<span class="badge bg-primary rounded-pill">@category.Amount</span>*@
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {   //TODO: User resources
+                    <div><b>No amount spent</b></div>
+                    }
+                </div>
+                <div class="col-6">
+                <b>Latest transactions and amount</b>
+                    @if (Transactions.Any())
+                    {
+                        <ol class="list-group list-group-numbered">
+                            @foreach (var transaction in Transactions)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        @transaction.DateTime.ToString(Constants.DATE_FORMAT) @transaction.CategoryName
+                                    </div>
+                                    <span>@transaction.Amount</span>
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {   //TODO: User resources
+                    <div><b>No transactions to display</b></div>
+                    }
+                </div>
+            </div>
+        @*</div>*@
+        
     </Authorized>
 </AuthorizeView>
 

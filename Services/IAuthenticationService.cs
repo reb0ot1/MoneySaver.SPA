@@ -7,5 +7,7 @@ namespace MoneySaver.SPA.Services
         //Task<RegistrationResponseDto> RegisterUser(UserForRegistrationDto userForRegistration);
         Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthenticationDto);
         Task Logout();
+
+        Task<bool> UserIsLogged();
     }
 }

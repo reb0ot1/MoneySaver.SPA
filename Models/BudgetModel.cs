@@ -10,6 +10,10 @@ namespace MoneySaver.SPA.Models
 
         //public BudgetType Type { get; set; }
 
+        public DateTime StartDate { get; set; }
+
+        public DateTime EndDate { get; set; }
+
         public BudgetItemModel[] BudgetItems { get; set; }
 
         public double LimitAmount { get; set; }

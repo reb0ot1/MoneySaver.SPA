@@ -29,7 +29,6 @@ namespace MoneySaver.SPA.Services
             this._authStateProvider = authenticationState;
             this._localStorage = localStorageService;
             this._identityAddress = spaSettings.Value.AuthenticationAddress;
-
         }
         public async Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthenticationDto)
         {
@@ -56,9 +55,21 @@ namespace MoneySaver.SPA.Services
             });
             await this._localStorage.SetItemAsStringAsync("authToken", result.Token);
             ((AuthStateProvider)this._authStateProvider).NotifyUserAuthentication(userForAuthenticationDto.Email);
-            this._client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", result.Token);
+            var token = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", result.Token);
+            this._client.DefaultRequestHeaders.Authorization = token;
 
             return new AuthResponseDto { IsAuthSuccessful = true };
+        }
+
+        public async Task<bool> UserIsLogged()
+        { 
+            var token = await this._localStorage.GetItemAsStringAsync("authToken");
+            if (token == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         public async Task Logout()

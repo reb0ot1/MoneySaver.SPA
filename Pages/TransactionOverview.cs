@@ -13,6 +13,12 @@ namespace MoneySaver.SPA.Pages
 
         protected RadzenGrid<Transaction> grid;
 
+        [Inject]
+        public NavigationManager navigation { get; set; }
+
+        [Inject]
+        public IAuthenticationService AuthenticationService { get; set; }
+
         public IEnumerable<Transaction> Transactions { get; set; }
 
         [Inject]
@@ -31,6 +37,11 @@ namespace MoneySaver.SPA.Pages
 
         protected async override Task OnInitializedAsync()
         {
+            if (!await AuthenticationService.UserIsLogged())
+            {
+                navigation.NavigateTo("/", true);
+            }
+
             TransactionCategories = await CategoryService.GetAllPreparedForVisualizationAsync();
 
             await this.ManageGridData();

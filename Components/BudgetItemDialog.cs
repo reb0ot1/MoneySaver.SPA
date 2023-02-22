@@ -19,6 +19,9 @@ namespace MoneySaver.SPA.Components
         public TransactionCategory[] ТransactionCategories { get; set; }
 
         [Parameter]
+        public int BudgetId { get; set; }
+
+        [Parameter]
         public EventCallback<bool> CloseEventCallback { get; set; }
 
         public string CategoryId { get; set; }
@@ -27,14 +30,16 @@ namespace MoneySaver.SPA.Components
 
         protected async Task HandleValidSubmit()
         {
+
+            //TODO: Find a better way to check if the request is for update or for add
             this.BudgetItemModel.TransactionCategoryId = int.Parse(CategoryId);
             if (this.forUpdate)
             {
-                await this.BudgetService.UpdateBudgetItem(this.BudgetItemModel);
+                await this.BudgetService.UpdateBudgetItem(this.BudgetId, this.BudgetItemModel);
             }
             else
             {
-                await this.BudgetService.AddBudgetItem(this.BudgetItemModel);
+                await this.BudgetService.AddBudgetItem(this.BudgetId, this.BudgetItemModel);
             }
 
             ShowDialog = false;
@@ -58,6 +63,7 @@ namespace MoneySaver.SPA.Components
                     LimitAmount = 0
                 };
             }
+
             this.OriginalBudgetItem = new BudgetItemModel
             {
                 TransactionCategoryId = this.BudgetItemModel.TransactionCategoryId,

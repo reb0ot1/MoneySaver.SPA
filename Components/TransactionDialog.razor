@@ -1,7 +1,7 @@
 ﻿@if (ShowDialog)
 {
     <div class="modal fade show d-block" id="exampleModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="titleLabel">Transaction</h5>
@@ -11,34 +11,88 @@
                 </div>
                
                 <EditForm Model="@Transaction" OnValidSubmit="@HandleValidSubmit">
-                    <div class="modal-body">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary />
-                        <div class="form-group">
-                            <label for="">Transaction date: </label>
-                            <RadzenDatePicker id="transactionDate" class="form-control" @bind-Value="@Transaction.TransactionDate" DateFormat="@Constants.DATE_FORMAT" />
-                            <ValidationMessage For="@(() => Transaction.TransactionDate)" />
-                        </div>
-                        <div class="form-group">
-                            <label for="transactionCategory" class="col-sm-3">Category: </label>
-                            <InputSelect id="transactionCategory" class="form-control col-sm-8" @bind-Value="@CategoryId">
-                                @foreach (var category in TransactionCategories)
+                    @if (this.forUpdate)
+                    {
+                        <div class="modal-body">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            <div class="form-group">
+                                <label for="">Transaction date: </label>
+                                <RadzenDatePicker id="transactionDate" class="form-control" @bind-Value="@Transaction.TransactionDate" DateFormat="@Constants.DATE_FORMAT" />
+                                <ValidationMessage For="@(() => Transaction.TransactionDate)" />
+                            </div>
+                            <div class="form-group">
+                                <label for="transactionCategory" class="col-sm-3">Category: </label>
+                                <InputSelect id="transactionCategory" class="form-control col-sm-8" @bind-Value="@CategoryId">
+                                    @foreach (var category in TransactionCategories)
                                     {
-                                    <option value="@category.TransactionCategoryId">@category.AlternativeName</option>
+                                        <option value="@category.TransactionCategoryId">@category.AlternativeName</option>
                                     }
-                            </InputSelect>
+                                </InputSelect>
+                            </div>
+                            <div class="form-group">
+                                <label for="">Amount: </label>
+                                <InputNumber id="amount" class="form-control" @bind-Value="@Transaction.Amount"></InputNumber>
+                                <ValidationMessage For="@(() => Transaction.Amount)" />
+                            </div>
+                            <div class="form-group">
+                                <label for="">AdditionalNote: </label>
+                                <InputTextArea id="additionalNote" class="form-control" @bind-Value="@Transaction.AdditionalNote" placeholder="Additional info"></InputTextArea>
+                                <ValidationMessage For="@(() => Transaction.AdditionalNote)" />
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="">Amount: </label>
-                            <InputNumber id="amount" class="form-control" @bind-Value="@Transaction.Amount"></InputNumber>
-                            <ValidationMessage For="@(() => Transaction.Amount)" />
+                    }
+                    else
+                    {
+                        <div class="modal-body">
+                            <a class="btn btn-outline-primary" @onclick="@Add">Add</a>
+                            <DataAnnotationsValidator />
+                            <ValidationSummary />
+                            <div class="form-group">
+                                <table style="vertical-align:top" class="col-12">
+                                    <tr>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Category
+                                        </th>
+                                        <th>
+                                            Amount
+                                        </th>
+                                        <th>
+                                            Additional note
+                                        </th>
+                                        <th>
+
+                                        </th>
+                                    </tr>
+                                    @foreach (var trans in TransactionsToAdd)
+                                    {
+                                        <tr>
+                                            <td><RadzenDatePicker id=@(String.Format("transactionDate{0}", trans.Index)) @bind-Value="@trans.TransactionDate" DateFormat="@Constants.DATE_FORMAT" /></td>
+                                            <td>
+                                                <InputSelect id=@(String.Format("transactionCategory{0}", trans.Index)) class="form-control col-sm-8" @bind-Value="@trans.TransactionCategoryId">
+                                                    @foreach (var category in TransactionCategories)
+                                                    {
+                                                        <option value="@category.TransactionCategoryId">@category.AlternativeName</option>
+                                                    }
+                                                </InputSelect>
+                                            </td>
+                                            <td>
+                                                <InputNumber id=@(String.Format("amount{0}", trans.Index)) class="form-control" @bind-Value="@trans.Amount"></InputNumber>
+                                            </td>
+                                            <td>
+                                                <InputTextArea id="@(String.Format("additionalNote{0}", trans.Index))" class="form-control" @bind-Value="@trans.AdditionalNote" placeholder="Additional info"></InputTextArea>
+                                            </td>
+                                            <td><span @onclick="@(x => Remove(trans.Index))" class="oi oi-trash" aria-hidden="true"></span></td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="">AdditionalNote: </label>
-                            <InputTextArea id="additionalNote" class="form-control" @bind-Value="@Transaction.AdditionalNote" placeholder="Additional info"></InputTextArea>
-                            <ValidationMessage For="@(() => Transaction.AdditionalNote)" />
-                        </div>
-                    </div>
+                    }
+                   
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save transaction</button>
                         <a class="btn btn-outline-primary" @onclick="@Close">Close</a>

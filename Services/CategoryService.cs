@@ -25,6 +25,7 @@ namespace MoneySaver.SPA.Services
                Encoding.UTF8, "application/json"
                );
 
+            //TODO: Add Http policy
             var response = await this.httpClient.PostAsync(new Uri(this.uri, "api/category"), categoryItemJson);
             if (response.IsSuccessStatusCode)
             {
@@ -34,6 +35,7 @@ namespace MoneySaver.SPA.Services
 
         public async Task<IEnumerable<TransactionCategory>> GetAllAsync()
         {
+            //TODO: Add Http policy
             IEnumerable<TransactionCategory> result = new List<TransactionCategory>();
             result = await httpClient.GetFromJsonAsync<IEnumerable<TransactionCategory>>(new Uri(this.uri, "api/category"));
 
@@ -71,7 +73,7 @@ namespace MoneySaver.SPA.Services
                JsonSerializer.Serialize(category),
                Encoding.UTF8, "application/json"
                );
-
+            //TODO: Add Http policy
             var response = await this.httpClient.PutAsync(new Uri(this.uri, "api/category"), categoryItemJson);
             if (response.IsSuccessStatusCode)
             {

@@ -8,8 +8,13 @@
         <p class="authorizing"></p>
     </Authorizing>
     <Authorized>
-        Logged as: @context.User.Claims.Where(e => e.Type == "name" || e.Type ==  ClaimTypes.Name ).FirstOrDefault()?.Value
-        <a href="logout">Log out</a>
+        <div class="row col-12">
+            <div class="col-6">Logged as: @context.User.Claims.Where(e => e.Type == "name" || e.Type ==  ClaimTypes.Name ).FirstOrDefault()?.Value</div>
+            <div class="col-6" style="text-align:right">
+                <a href="logout">Log out</a>
+            </div>
+        </div>
+        
         @*<button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>*@
     </Authorized>
     <NotAuthorized>

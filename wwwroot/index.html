@@ -64,9 +64,21 @@
     </div>
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
+        <div class="modal fade show d-block" id="exampleModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="titleLabel">Error</h5>
+                    </div>
+                    <div class="modal-body">
+                        An unhandled error has occurred. Please refresh the page.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary dismiss" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>

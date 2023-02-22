@@ -11,7 +11,7 @@ namespace MoneySaver.SPA.AuthProviders
         private readonly ILocalStorageService _localStorage;
         private readonly AuthenticationState _anonymous;
 
-        public AuthStateProvider(HttpClient httpClient, ILocalStorageService localStorage)
+        public AuthStateProvider(HttpClient httpClient, ILocalStorageService localStorage, IHttpClientFactory httpClientFactory)
         {
             this._httpClient = httpClient;
             this._localStorage = localStorage;
@@ -25,7 +25,7 @@ namespace MoneySaver.SPA.AuthProviders
                 return this._anonymous;
 
             this._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
-                
+
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType")));
         }
 

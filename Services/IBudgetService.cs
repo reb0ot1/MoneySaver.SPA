@@ -1,19 +1,15 @@
 ﻿using MoneySaver.SPA.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MoneySaver.SPA.Services
 {
     public interface IBudgetService
     {
-        Task<BudgetModel> GetBudgetByTimeType(int intType);
+        Task<BudgetModel> GetBudgetInUseItems();
 
-        Task AddBudgetItem(BudgetItemModel budgetItem);
+        Task AddBudgetItem(int budgetId, BudgetItemModel budgetItem);
 
-        Task UpdateBudgetItem(BudgetItemModel budgetItem);
+        Task UpdateBudgetItem(int budgetId, BudgetItemModel budgetItem);
 
-        Task RemoveBudgetItem(int id);
+        Task RemoveBudgetItem(int budgetId, int itemId);
     }
 }
