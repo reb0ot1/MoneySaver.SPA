@@ -1,0 +1,71 @@
+﻿@page "/budgets"
+@using System.Linq
+@using Microsoft.AspNetCore.Authorization
+@using Radzen.Blazor
+@attribute [Authorize]
+<h3>Budgets</h3>
+@if (BudgetsList == null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    if (ShowBudgets)
+    {
+        if (!BudgetsList.Any())
+        {
+            <div><b>No budgets to display</b></div>
+        }
+        else
+        {
+            <div style="margin-bottom:10px">
+                <button @onclick="CreateBudget" class="btn btn-info table-btn"><i class="fas fa-plus" /> Create budget</button>
+            </div>
+
+            @*        <button type="button" class="btn btn-info" @onclick="@(() => test_click())">
+            <i class="fas fa-plus"></i>Test click
+        </button>*@
+
+            <RadzenGrid @ref="grid" AllowFiltering="false" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadGridData"
+            AllowSorting="true" Data="@BudgetsList" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" ColumnWidth="200px">
+                <Columns>
+                    <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Budget name">
+                        <Template Context="data">
+                            @data.Name
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Start date">
+                        <Template Context="data">
+                            @data.StartDate.ToString(Constants.DATE_FORMAT)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="End date">
+                        <Template Context="data">
+                            @data.EndDate.ToString(Constants.DATE_FORMAT) - @data.EndDate.ToString(Constants.DATE_FORMAT)
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Budget type">
+                        <Template Context="data">
+                            @data.BudgetType.ToString()
+                        </Template>
+                    </RadzenGridColumn>
+                    <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel">
+                        <Template Context="data">
+                            <RadzenButton Click="@((args) => EditBudget(data.Id))" Icon="edit" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+                            <RadzenButton Click="@((args) => ShowBudgetItem(data.Id))" Text="Items" ButtonStyle="Radzen.ButtonStyle.Secondary" />
+                            <RadzenLabel Style="font-weight:600" Text="In use" Visible="@(data.IsInUse)" />
+                        </Template>
+                    </RadzenGridColumn>
+                </Columns>
+            </RadzenGrid>
+
+            <BudgetDialog @ref="BudgetDialog" CloseEventCallback="@OnDialogClose"></BudgetDialog>
+        }
+    }
+
+    <BudgetComponent @ref="BudgetComponent" BudgetModel="@this.BudgetModel" TransactionCategories="@this.TransactionCategories"></BudgetComponent>
+}

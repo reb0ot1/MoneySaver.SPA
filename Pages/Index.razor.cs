@@ -14,6 +14,8 @@ namespace MoneySaver.SPA.Pages
 
         private string Name = string.Empty;
 
+        private BudgetViewModel BudgetModel { get; set; }
+
         [Inject]
         private IBudgetService budgetService { get; set; }
 
@@ -22,6 +24,9 @@ namespace MoneySaver.SPA.Pages
 
         [Inject]
         private ITransactionService transactionService { get; set; }
+
+        [Inject]
+        private IReportDataService reportDataService { get; set; }
 
         [Inject]
         public AuthenticationStateProvider StateProv { get; set; }
@@ -36,13 +41,19 @@ namespace MoneySaver.SPA.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            BudgetModel currentBudget = await this.budgetService.GetBudgetInUseItems();
+            var budgetTask = this.budgetService.GetBudgetInUseItems();
+            var categoriesTask = this.categoryService.GetAllPreparedForVisualizationAsync();
+
+            await Task.WhenAll(budgetTask, categoriesTask);
+
+            var currentBudget = budgetTask.Result;
+            this.BudgetModel = currentBudget;
             this.StartDate = currentBudget.StartDate;
             this.EndDate = currentBudget.EndDate;
             var budgetCategoryIds = currentBudget.BudgetItems.Select(e => e.TransactionCategoryId);
-            var categories = await this.categoryService.GetAllPreparedForVisualizationAsync();
-            categories = categories.Where(w => budgetCategoryIds.Contains(w.TransactionCategoryId)).ToList();
-            this.InitializeCategories(categories);
+            var categories = categoriesTask.Result;
+            var categoriesBasedOnBudget = categories.Where(w => budgetCategoryIds.Contains(w.TransactionCategoryId)).ToList();
+            this.InitializeCategories(categoriesBasedOnBudget);
             this.InitializeTransactions(categories);
         }
 
@@ -78,8 +89,11 @@ namespace MoneySaver.SPA.Pages
 
         private async Task InitializeCategories(IEnumerable<TransactionCategory> categories)
         {
-            //TODO: Budget type to be refactored
-            var spentAmountByCategories = await this.transactionService.GetSpentAmountByCategory(Models.Enums.BudgetType.Monthly, TopCategoriesSpentAmount);
+            var spentAmountByCategories = await this.reportDataService.GetSpentAmountByCategory(
+                this.BudgetModel.StartDate, 
+                this.BudgetModel.EndDate,
+                TopCategoriesSpentAmount
+                );
 
             var categoriesResult = new List<CategoryAmountSpentModel>();
             foreach (var category in spentAmountByCategories)

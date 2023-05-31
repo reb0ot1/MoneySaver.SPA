@@ -1,6 +1,6 @@
 ﻿namespace MoneySaver.SPA.Models.Filters
 {
-    public class FilterModel
+    public class FilterViewModel
     {
         public DateTime From { get; set; } = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 

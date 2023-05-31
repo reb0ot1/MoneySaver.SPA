@@ -59,26 +59,22 @@ namespace MoneySaver.SPA.Pages
 
         protected void AddItem(TransactionCategory item = null)
         {
-            if (item != null)
+            if (item != null && item.ParentId == null)
             {
-                if (item.ParentId == null)
-                {
-                    var newItem = new TransactionCategory();
-                    newItem.ParentId = item.TransactionCategoryId;
+                var newItem = new TransactionCategory();
+                newItem.ParentId = item.TransactionCategoryId;
 
-
-                    this.CategoryDialog.Show(newItem);
-                }
+                this.CategoryDialog.Show(Models.Enums.CommandType.Add, newItem);
             }
             else
             {
-                this.CategoryDialog.Show(item);
+                this.CategoryDialog.Show(Models.Enums.CommandType.Add);
             }
         }
 
         protected void EditItem(TransactionCategory parrentItem)
         {
-            this.CategoryDialog.Show(parrentItem);
+            this.CategoryDialog.Show(Models.Enums.CommandType.Update, parrentItem);
         }
 
         protected void DeleteOperation(TransactionCategory parrentItem)

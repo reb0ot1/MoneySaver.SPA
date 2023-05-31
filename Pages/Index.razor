@@ -8,26 +8,29 @@
         @*<div class="container">*@
             <div class="row">
                 <div class="col-6">
-                <b>Top categories spent amount</b> (@this.StartDate.ToString(Constants.DATE_FORMAT) - @this.EndDate.ToString(Constants.DATE_FORMAT))
-                    @if (CategoriesSpentAmount.Any())
-                    {
-                        <ol class="list-group list-group-numbered">
-                            @foreach (var category in CategoriesSpentAmount)
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-start">
-                                    <div class="ms-2 me-auto">
-                                        @category.Name
-                                    </div>
-                                <span><b>@category.Amount</b></span>
-                                    @*<span class="badge bg-primary rounded-pill">@category.Amount</span>*@
-                                </li>
-                            }
-                        </ol>
-                    }
-                    else
-                    {   //TODO: User resources
-                    <div><b>No amount spent</b></div>
-                    }
+                <b>Top categories spent amount</b> @if (CategoriesSpentAmount.Any())
+                {
+                    <span>(@this.StartDate.ToString(Constants.DATE_FORMAT) - @this.EndDate.ToString(Constants.DATE_FORMAT))</span>
+                }
+                @if (CategoriesSpentAmount.Any())
+                {
+                    <ol class="list-group list-group-numbered">
+                        @foreach (var category in CategoriesSpentAmount)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    @category.Name
+                                </div>
+                            <span><b>@category.Amount</b></span>
+                                @*<span class="badge bg-primary rounded-pill">@category.Amount</span>*@
+                            </li>
+                        }
+                    </ol>
+                }
+                else
+                {   //TODO: User resources
+                <div><b>No amount spent</b></div>
+                }
                 </div>
                 <div class="col-6">
                 <b>Latest transactions and amount</b>

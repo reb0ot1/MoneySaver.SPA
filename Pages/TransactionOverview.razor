@@ -26,7 +26,7 @@ else
    }
    else
    {
-        <RadzenGrid @ref="grid" AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadGridData"
+        <RadzenGrid @ref="grid" AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="Constants.ITEMS_PER_PAGE" LoadData="@LoadGridData"
                     AllowSorting="true" Data="@Transactions" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Transaction" ColumnWidth="200px">
             <Columns>
                 <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">

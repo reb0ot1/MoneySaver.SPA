@@ -10,6 +10,5 @@ namespace MoneySaver.SPA.Services
         Task<IEnumerable<Transaction>> AddManyAsync(IEnumerable<Transaction> transactions);
         Task UpdateAsync(Transaction transaction);
         Task DeleteAsync(string transactionId);
-        Task<IEnumerable<IdAndValue<double?>>> GetSpentAmountByCategory(BudgetType budgetType, int? itemsToTake);
     }
 }

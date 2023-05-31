@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MoneySaver.SPA.Models;
+using MoneySaver.SPA.Models.Enums;
 using MoneySaver.SPA.Services;
 
 namespace MoneySaver.SPA.Components
 {
     public partial class BudgetItemDialog
     {
-        private bool forUpdate = false;
+        private CommandType? command;
 
         private BudgetItemModel OriginalBudgetItem = null;
 
@@ -30,14 +31,14 @@ namespace MoneySaver.SPA.Components
 
         protected async Task HandleValidSubmit()
         {
-
             //TODO: Find a better way to check if the request is for update or for add
             this.BudgetItemModel.TransactionCategoryId = int.Parse(CategoryId);
-            if (this.forUpdate)
+            if (this.command == CommandType.Update)
             {
                 await this.BudgetService.UpdateBudgetItem(this.BudgetId, this.BudgetItemModel);
             }
-            else
+
+            if (this.command == CommandType.Add)
             {
                 await this.BudgetService.AddBudgetItem(this.BudgetId, this.BudgetItemModel);
             }
@@ -46,22 +47,26 @@ namespace MoneySaver.SPA.Components
             await CloseEventCallback.InvokeAsync(true);
         }
 
-        public void Show(BudgetItemModel model = null)
+        public void Show(CommandType command, BudgetItemModel model = null)
         {
-            if (model != null)
+            switch (command)
             {
-                this.CategoryId = model.TransactionCategoryId.ToString();
-                this.BudgetItemModel = model;
-                this.forUpdate = true;
-            }
-            else
-            {
-                var defaultCategory = this.ТransactionCategories.First();
-                this.BudgetItemModel = new BudgetItemModel
-                {
-                    TransactionCategoryId = (int)defaultCategory.TransactionCategoryId,
-                    LimitAmount = 0
-                };
+                case CommandType.Add:
+                    var defaultCategory = this.ТransactionCategories.First();
+                    this.CategoryId = defaultCategory.TransactionCategoryId.ToString();
+                    this.BudgetItemModel = new BudgetItemModel
+                    {
+                        TransactionCategoryId = defaultCategory.TransactionCategoryId,
+                        LimitAmount = 0
+                    };
+                    
+                    break;
+                case CommandType.Update:
+                    this.CategoryId = model.TransactionCategoryId.ToString();
+                    this.BudgetItemModel = model;
+                    break;
+                default:
+                    return;
             }
 
             this.OriginalBudgetItem = new BudgetItemModel
@@ -70,6 +75,7 @@ namespace MoneySaver.SPA.Components
                 LimitAmount = this.BudgetItemModel.LimitAmount
             };
 
+            this.command = command;
             this.ShowDialog = true;
             StateHasChanged();
         }
@@ -86,7 +92,7 @@ namespace MoneySaver.SPA.Components
         private void ResetDialog()
         {
             var defaultCategory = this.ТransactionCategories.First();
-            this.forUpdate = false;
+            this.command = null;
             this.BudgetItemModel.TransactionCategoryId = (int)defaultCategory.TransactionCategoryId;
             this.BudgetItemModel.LimitAmount = 0;
             this.CategoryId = defaultCategory.TransactionCategoryId.ToString();

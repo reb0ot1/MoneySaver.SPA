@@ -9,8 +9,6 @@ namespace MoneySaver.SPA.Pages
 {
     public partial class TransactionOverview
     {
-        protected const int ItemsPerPage = 50;
-
         protected RadzenGrid<Transaction> grid;
 
         [Inject]
@@ -37,11 +35,6 @@ namespace MoneySaver.SPA.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            if (!await AuthenticationService.UserIsLogged())
-            {
-                navigation.NavigateTo("/", true);
-            }
-
             TransactionCategories = await CategoryService.GetAllPreparedForVisualizationAsync();
 
             await this.ManageGridData();
@@ -50,6 +43,7 @@ namespace MoneySaver.SPA.Pages
         public async Task LoadGridData(LoadDataArgs args)
         {
             this.SkipedItems = args.Skip ?? 0;
+            
             await this.ManageGridData();
         }
 
@@ -89,7 +83,7 @@ namespace MoneySaver.SPA.Pages
 
         public async Task OnDialogClose(bool result)
         {
-            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage, null);
+            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, Constants.ITEMS_PER_PAGE, null);
             this.TotalCount = pageResult.TotalCount;
             Transactions = pageResult.Result;
             StateHasChanged();
@@ -97,7 +91,7 @@ namespace MoneySaver.SPA.Pages
 
         private async Task ManageGridData()
         {
-            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, ItemsPerPage, this.Search);
+            var pageResult = await this.TransactionService.GetForPage(this.SkipedItems, Constants.ITEMS_PER_PAGE, this.Search);
             this.TotalCount = pageResult.TotalCount;
             this.Transactions = pageResult.Result;
         }

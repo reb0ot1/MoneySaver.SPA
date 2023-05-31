@@ -18,7 +18,7 @@ namespace MoneySaver.SPA.Pages
 
         public LineChartDataModel ExpensesByPeriodForCategoriesChartData { get; set; }
 
-        public FilterModel Filter { get; set; }
+        public FilterViewModel Filter { get; set; }
 
         [Inject]
         public IReportDataService reportDataService { get; set; }
@@ -31,7 +31,7 @@ namespace MoneySaver.SPA.Pages
             await base.OnInitializedAsync();
 
             //TODO: filtration needs refactoring
-            this.Filter = new FilterModel();
+            this.Filter = new FilterViewModel();
             var categories = await this.categoryService.GetAllPreparedForVisualizationAsync();
             this.CategoryRecords = categories;
             this.CategoryIdsSelected = this.CategoryRecords.Select(e => e.TransactionCategoryId).ToList();

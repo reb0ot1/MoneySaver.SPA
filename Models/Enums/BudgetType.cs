@@ -2,8 +2,9 @@
 {
     public enum BudgetType
     {
-        Weekly = 1,
+        Weekly,
         Monthly,
-        Yearly
+        Yearly,
+        Custom
     }
 }

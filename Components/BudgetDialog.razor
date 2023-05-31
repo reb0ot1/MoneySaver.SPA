@@ -1,0 +1,54 @@
+﻿@using MoneySaver.SPA.Models.Enums;
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="exampleModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleLabel">Budget</h5>
+                    <button type="button" class="close" @onclick="@Close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <EditForm Model="@BudgetModel" OnValidSubmit="@HandleValidSubmit">
+                    <div class="modal-body">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="form-group">
+                            <label for="budgetName">Name: </label>
+                            <InputText id="budgetName" class="form-control" @bind-Value="@BudgetModel.Name"></InputText>
+                            <ValidationMessage For="@(() => BudgetModel.Name)" />
+                        </div>
+                        <div>
+                            <label for="startDate">Start date: </label><br />
+                            <RadzenDatePicker id="startDate" @bind-Value="@BudgetModel.StartDate" DateFormat="@Constants.DATE_FORMAT" />
+                            <ValidationMessage For="@(() => BudgetModel.StartDate)" />
+                        </div>
+                        <div>
+                            <label for="endDate">End date: </label><br />
+                            <RadzenDatePicker id="endDate" @bind-Value="@BudgetModel.EndDate" DateFormat="@Constants.DATE_FORMAT" />
+                            <ValidationMessage For="@(() => BudgetModel.EndDate)" />
+                        </div>
+                        <div>
+                            <label for="budgetType" class="col-sm-3">Type: </label>
+                            <InputSelect id="budgetType" class="form-control col-sm-3" @bind-Value="@BudgetModel.BudgetType">
+                                @foreach (BudgetType budgetTypeItem in Enum.GetValues(typeof(BudgetType)))
+                                {
+                                    <option value="@budgetTypeItem">@budgetTypeItem.ToString()</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-group">
+                            <InputCheckbox id="budgetIsInUse"  @bind-Value="@BudgetModel.IsInUse" />
+                            <label for="budgetIsInUse">In use</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <a class="btn btn-outline-primary" @onclick="@Close">Close</a>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+}

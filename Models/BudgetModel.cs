@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MoneySaver.SPA.Models.Enums;
 
 namespace MoneySaver.SPA.Models
 {
@@ -8,18 +6,14 @@ namespace MoneySaver.SPA.Models
     {
         public int Id { get; set; }
 
-        //public BudgetType Type { get; set; }
+        public string Name { get; set; }
+
+        public BudgetType BudgetType { get; set; }
 
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
 
-        public BudgetItemModel[] BudgetItems { get; set; }
-
-        public double LimitAmount { get; set; }
-
-        public double TotalSpentAmmount { get; set; }
-
-        public double TotalLeftAmount { get; set; }
+        public bool IsInUse { get; set; }
     }
 }

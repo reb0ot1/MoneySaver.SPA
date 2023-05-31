@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
 using System.Net.Http.Json;
@@ -20,10 +21,7 @@ namespace MoneySaver.SPA.Services
 
         public async Task AddCategory(TransactionCategory category)
         {
-            var categoryItemJson = new StringContent(
-               JsonSerializer.Serialize(category),
-               Encoding.UTF8, "application/json"
-               );
+            var categoryItemJson = RequestContent.CreateContent(category);
 
             //TODO: Add Http policy
             var response = await this.httpClient.PostAsync(new Uri(this.uri, "api/category"), categoryItemJson);
@@ -69,10 +67,7 @@ namespace MoneySaver.SPA.Services
 
         public async Task UpdateCategory(TransactionCategory category)
         {
-            var categoryItemJson = new StringContent(
-               JsonSerializer.Serialize(category),
-               Encoding.UTF8, "application/json"
-               );
+            var categoryItemJson = RequestContent.CreateContent(category);
             //TODO: Add Http policy
             var response = await this.httpClient.PutAsync(new Uri(this.uri, "api/category"), categoryItemJson);
             if (response.IsSuccessStatusCode)

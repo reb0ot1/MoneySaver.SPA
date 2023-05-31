@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
 using MoneySaver.SPA.AuthProviders;
+using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
-using System.Text;
 using System.Text.Json;
 
 namespace MoneySaver.SPA.Services
@@ -12,7 +12,6 @@ namespace MoneySaver.SPA.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly HttpClient _client;
-        //private readonly JsonSerializerOptions _options;
         private readonly AuthenticationStateProvider _authStateProvider;
         private readonly ILocalStorageService _localStorage;
         private readonly string _identityAddress;
@@ -32,8 +31,7 @@ namespace MoneySaver.SPA.Services
         }
         public async Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthenticationDto)
         {
-            var content = JsonSerializer.Serialize(userForAuthenticationDto);
-            var bodyContent = new StringContent(content, Encoding.UTF8, "application/json");
+            var bodyContent = RequestContent.CreateContent(userForAuthenticationDto);
             
             var authUri = new Uri(new Uri(this._identityAddress), "login");
             var authResult = await this._client.PostAsync(authUri, bodyContent);
@@ -77,6 +75,27 @@ namespace MoneySaver.SPA.Services
             await _localStorage.RemoveItemAsync("authToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();
             _client.DefaultRequestHeaders.Authorization = null;
+        }
+
+        public async Task<ServiceResult<bool>> RegisterUser(UserForRegistration userForRegistration)
+        {
+            var bodyContent = RequestContent.CreateContent(userForRegistration);
+            var authUri = new Uri(new Uri(this._identityAddress), "register");
+            var authResult = await this._client.PostAsync(authUri, bodyContent);
+            var authContent = await authResult.Content.ReadAsStringAsync();
+            if (!authResult.IsSuccessStatusCode)
+            {
+                var errors = JsonSerializer.Deserialize<List<string>>(authContent);
+                return new ServiceResult<bool>
+                {
+                    Errors = errors
+                };
+            }
+
+            return new ServiceResult<bool>
+            {
+                Result = true
+            };
         }
     }
 }

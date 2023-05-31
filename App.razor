@@ -1,5 +1,9 @@
-﻿<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
+﻿@using MoneySaver.SPA.Services;
+@inject IAuthenticationService AuthenticationService
+@inject NavigationManager navigation
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="@OnNavigateAsync">
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
                 <Authorizing>
@@ -27,3 +31,15 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    private async Task OnNavigateAsync(NavigationContext context)
+    {
+        var auth = await AuthenticationService.UserIsLogged();
+        //TODO: Need to use constan variables for the routes
+        if (!auth && context.Path != "login" && context.Path != "register")
+        {
+            navigation.NavigateTo("/login", true);
+        }
+    }
+}
