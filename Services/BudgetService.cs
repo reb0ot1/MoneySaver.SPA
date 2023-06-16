@@ -22,7 +22,7 @@ namespace MoneySaver.SPA.Services
 
 
         //TODO: Needs to be refactored. Get only the budget in use. The items gathering should be a different method
-        public async Task<BudgetViewModel> GetBudgetInUseItems()
+        public async Task<BudgetViewModel> GetBudgetInUseAsync()
         {
             var budgetInUserRequest = await httpClient.GetFromJsonAsync<BudgetResponseModel>(new Uri(this.uri, $"{BaseApiPath}/inuse"));
             if (budgetInUserRequest == null)
@@ -31,28 +31,29 @@ namespace MoneySaver.SPA.Services
                 return null;
             }
 
-            var uri = new Uri(this.uri, $"{BaseApiPath}/{budgetInUserRequest.Id}/items");
-            var budgetInUseItems = await httpClient.GetFromJsonAsync<IEnumerable<BudgetItemResponseModel>>(uri);
+            //var uri = new Uri(this.uri, $"{BaseApiPath}/{budgetInUserRequest.Id}/items");
+            //var budgetInUseItems = await httpClient.GetFromJsonAsync<IEnumerable<BudgetItemResponseModel>>(uri);
 
             var budgetModel = new BudgetViewModel
             {
                 Id = budgetInUserRequest.Id,
-                BudgetItems = budgetInUseItems.Select(entity => new BudgetItemModel { 
-                    Id = entity.Id,
-                    BudgetId = budgetInUserRequest.Id,
-                    LimitAmount= entity.LimitAmount,
-                    Progress = entity.Progress,
-                    SpentAmount= entity.SpentAmount,
-                    TransactionCategoryId = entity.TransactionCategoryId,
-                    TransactionCategoryName = entity.TransactionCategoryName
-                }).OrderBy(o => o.TransactionCategoryName).ToArray()
+                StartDate = budgetInUserRequest.StartDate,
+                EndDate = budgetInUserRequest.EndDate,
+                IsInUse = budgetInUserRequest.IsInUse
+                //BudgetItems = budgetInUseItems.Select(entity => new BudgetItemModel { 
+                //    Id = entity.Id,
+                //    BudgetId = budgetInUserRequest.Id,
+                //    LimitAmount= entity.LimitAmount,
+                //    Progress = entity.Progress,
+                //    SpentAmount= entity.SpentAmount,
+                //    TransactionCategoryId = entity.TransactionCategoryId,
+                //    TransactionCategoryName = entity.TransactionCategoryName
+                //}).OrderBy(o => o.TransactionCategoryName).ToArray()
             };
 
-            budgetModel.StartDate = budgetInUserRequest.StartDate;
-            budgetModel.EndDate = budgetInUserRequest.EndDate;
-            budgetModel.LimitAmount = budgetModel.BudgetItems.Sum(s => s.LimitAmount);
-            budgetModel.TotalSpentAmmount = budgetModel.BudgetItems.Sum(s => s.SpentAmount);
-            budgetModel.TotalLeftAmount = budgetModel.LimitAmount - budgetModel.TotalSpentAmmount;
+            //budgetModel.LimitAmount = budgetModel.BudgetItems.Sum(s => s.LimitAmount);
+            //budgetModel.TotalSpentAmmount = budgetModel.BudgetItems.Sum(s => s.SpentAmount);
+            //budgetModel.TotalLeftAmount = budgetModel.LimitAmount - budgetModel.TotalSpentAmmount;
 
             return budgetModel;
         }
@@ -76,7 +77,7 @@ namespace MoneySaver.SPA.Services
                 SpentAmount = entity.SpentAmount,
                 TransactionCategoryId = entity.TransactionCategoryId,
                 TransactionCategoryName = entity.TransactionCategoryName
-            }).OrderBy(o => o.TransactionCategoryName);
+            });
         }
 
         public async Task<BudgetResponseModel> GetBudgetAsync(int budgetId)

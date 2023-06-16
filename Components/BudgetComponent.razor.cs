@@ -7,11 +7,6 @@ namespace MoneySaver.SPA.Components
 {
     public partial class BudgetComponent
     {
-
-        //TODO: Move these constants somewhere else
-        public const int levelLow = 20;
-        public const int levelMiddle = 60;
-
         public bool ShowComponent { get; set; }
 
         [Inject]
@@ -25,25 +20,41 @@ namespace MoneySaver.SPA.Components
 
         protected BudgetItemDialog BudgetItemDialog { get; set; }
 
+        //protected BudgetItemModel[] BudgetItems { get; set; } = new BudgetItemModel[] { };
+
+        public BudgetViewModel BudgetComponentModel { get; set; }
+
         protected async override Task OnInitializedAsync()
         {
-            if (BudgetModel != null)
+            if (this.BudgetModel != null)
             {
+                this.BudgetComponentModel = new BudgetViewModel
+                {
+                    Id = this.BudgetModel.Id,
+                    StartDate = this.BudgetModel.StartDate,
+                    EndDate = this.BudgetModel.EndDate,
+                    IsInUse = this.BudgetModel.IsInUse
+                };
+
                 await this.UpdateCompoment();
+
+                //StateHasChanged();
             }
         }
 
         protected void AddItem()
         {
             this.BudgetItemDialog.Show(CommandType.Add);
+            StateHasChanged();
         }
 
         protected async Task CopyBudgetInUseItems()
         {
-            var currentlyInUseBudget = await this.BudgetService.GetBudgetInUseItems();
-
+            var currentlyInUseBudget = await this.BudgetService.GetBudgetInUseAsync();
+            var currentlyInUseBudgetItems = await this.BudgetService.GetBudgetItemsAsync(currentlyInUseBudget.Id);
+            
             //TODO: Use bulk request
-            foreach (var budgetItem in currentlyInUseBudget.BudgetItems)
+            foreach (var budgetItem in currentlyInUseBudgetItems)
             {
                 await this.BudgetService.AddBudgetItem(this.BudgetModel.Id, budgetItem);
             }
@@ -80,17 +91,15 @@ namespace MoneySaver.SPA.Components
         //TODO: This method for customize visualization should be moved somewhere else
         private static string CheckLevel(int percValue)
         {
-            if (levelLow < percValue && percValue <= levelMiddle)
+            switch (percValue)
             {
-                return "bg-warning";
+                case <= Constants.BUDGET_ITEM_LOW_LEVEL:
+                    return "bg-danger";
+                case <= Constants.BUDGET_ITEM_MIDDLE_LEVEL:
+                    return "bg-warning";
+                default:
+                    return "bg-success";
             }
-
-            if (percValue <= levelLow)
-            {
-                return "bg-danger";
-            }
-
-            return "bg-success";
         }
 
         public static string CheckColor(double value)
@@ -107,19 +116,31 @@ namespace MoneySaver.SPA.Components
         {
             var budgetItems = await this.BudgetService.GetBudgetItemsAsync(BudgetModel.Id);
 
-            this.BudgetModel.LimitAmount = budgetItems.Sum(s => s.LimitAmount);
-            this.BudgetModel.TotalSpentAmmount = budgetItems.Sum(s => s.SpentAmount);
-            this.BudgetModel.TotalLeftAmount = this.BudgetModel.LimitAmount - this.BudgetModel.TotalSpentAmmount;
-            this.BudgetModel.BudgetItems = budgetItems.ToArray();
-
-            foreach (var item in this.BudgetModel.BudgetItems)
+            this.BudgetComponentModel.LimitAmount = budgetItems.Sum(s => s.LimitAmount);
+            this.BudgetComponentModel.TotalSpentAmmount = budgetItems.Sum(s => s.SpentAmount);
+            this.BudgetComponentModel.TotalLeftAmount = this.BudgetComponentModel.LimitAmount - this.BudgetComponentModel.TotalSpentAmmount;
+            var testItems = budgetItems.ToList();
+            foreach (var item in testItems)
             {
-                if (item != null)
+                if (item == null)
                 {
-                    item.TransactionCategory = this.TransactionCategories
-                        .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
+                    continue;
                 }
+                var categoryToFind = this.TransactionCategories
+                       .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
+
+
+                item.TransactionCategory = new TransactionCategory { 
+                    AlternativeName = categoryToFind.AlternativeName,
+                    Name = categoryToFind.Name,
+                    TransactionCategoryId = categoryToFind.TransactionCategoryId,
+                    ParentId = categoryToFind.ParentId
+                };
             }
+
+            this.BudgetComponentModel.BudgetItems = testItems
+                .OrderBy(e => e.TransactionCategory?.AlternativeName)
+                .ToArray();
         }
     }
 }

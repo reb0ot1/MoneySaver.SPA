@@ -41,18 +41,23 @@ namespace MoneySaver.SPA.Pages
 
         protected async override Task OnInitializedAsync()
         {
-            var budgetTask = this.budgetService.GetBudgetInUseItems();
+            var budgetTask = this.budgetService.GetBudgetInUseAsync();
             var categoriesTask = this.categoryService.GetAllPreparedForVisualizationAsync();
 
             await Task.WhenAll(budgetTask, categoriesTask);
 
             var currentBudget = budgetTask.Result;
+
+            var budgetItems = await this.budgetService.GetBudgetItemsAsync(currentBudget.Id);
+            currentBudget.BudgetItems = budgetItems.ToArray();
+
             this.BudgetModel = currentBudget;
             this.StartDate = currentBudget.StartDate;
             this.EndDate = currentBudget.EndDate;
             var budgetCategoryIds = currentBudget.BudgetItems.Select(e => e.TransactionCategoryId);
             var categories = categoriesTask.Result;
             var categoriesBasedOnBudget = categories.Where(w => budgetCategoryIds.Contains(w.TransactionCategoryId)).ToList();
+
             this.InitializeCategories(categoriesBasedOnBudget);
             this.InitializeTransactions(categories);
         }

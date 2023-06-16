@@ -7,7 +7,7 @@ namespace MoneySaver.SPA.Services
     {
         Task<PageResponseModel<BudgetResponseModel>> GetBudgetsPerPageAsync(int itemsToSkip, int itemsPerPage);
 
-        Task<BudgetViewModel> GetBudgetInUseItems();
+        Task<BudgetViewModel> GetBudgetInUseAsync();
 
         Task<BudgetResponseModel> CreateBudgetAsync(BudgetModel budgetModel);
 

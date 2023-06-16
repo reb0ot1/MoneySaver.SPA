@@ -66,6 +66,8 @@ else
             <BudgetDialog @ref="BudgetDialog" CloseEventCallback="@OnDialogClose"></BudgetDialog>
         }
     }
-
-    <BudgetComponent @ref="BudgetComponent" BudgetModel="@this.BudgetModel" TransactionCategories="@this.TransactionCategories"></BudgetComponent>
+    @if (this.BudgetModel != null)
+    {
+        <BudgetComponent @ref="BudgetComponent" BudgetModel="@this.BudgetModel" TransactionCategories="@this.TransactionCategories"></BudgetComponent>
+    }
 }
