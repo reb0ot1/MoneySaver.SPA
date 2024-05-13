@@ -74,12 +74,24 @@ namespace MoneySaver.SPA.Components
 
         private void UpdateBudgetDates()
         {
-            //TODO: Think a way to optimeze it
-            var startDate = new DateTime(this.BudgetModel.StartDate.Year, this.BudgetModel.StartDate.Month, this.BudgetModel.StartDate.Day, 0, 0, 0);
-            var endDate = new DateTime(this.BudgetModel.EndDate.Year, this.BudgetModel.EndDate.Month, this.BudgetModel.EndDate.Day, 23, 59, 59, 999);
+            this.BudgetModel.StartDate = new DateTime(
+                this.BudgetModel.StartDate.Year, 
+                this.BudgetModel.StartDate.Month, 
+                this.BudgetModel.StartDate.Day,
+                0, 
+                0, 
+                0
+                );
 
-            this.BudgetModel.StartDate = startDate;
-            this.BudgetModel.EndDate = endDate;
+            this.BudgetModel.EndDate = new DateTime(
+                this.BudgetModel.EndDate.Year,
+                this.BudgetModel.EndDate.Month,
+                this.BudgetModel.EndDate.Day,
+                23,
+                59,
+                59,
+                999
+                );
         }
     }
 }

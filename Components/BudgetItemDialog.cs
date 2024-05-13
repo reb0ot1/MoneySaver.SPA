@@ -31,7 +31,6 @@ namespace MoneySaver.SPA.Components
 
         protected async Task HandleValidSubmit()
         {
-            //TODO: Find a better way to check if the request is for update or for add
             this.BudgetItemModel.TransactionCategoryId = int.Parse(CategoryId);
             if (this.command == CommandType.Update)
             {
