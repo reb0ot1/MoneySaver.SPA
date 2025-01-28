@@ -26,29 +26,29 @@ else
    }
    else
    {
-        <RadzenGrid @ref="grid" AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="Constants.ITEMS_PER_PAGE" LoadData="@LoadGridData"
+        <RadzenDataGrid @ref="grid" AllowFiltering="true" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="true" PageSize="Constants.ITEMS_PER_PAGE" LoadData="@LoadGridData"
                     AllowSorting="true" Data="@Transactions" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Transaction" ColumnWidth="200px">
             <Columns>
-                <RadzenGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">
+                <RadzenDataGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Transaction" SortProperty="" Property="TransactionDate" Title="Transaction Date">
                     <Template Context="data">
                         @data.TransactionDate.ToString(Constants.DATE_FORMAT)
                     </Template>
-                </RadzenGridColumn>
-                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="TransactionCategoryId" Title="Category" Filterable="false" Sortable="false">
+                </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="TransactionCategoryId" Title="Category" Filterable="false" Sortable="false">
                         <Template Context="data">
                             @TransactionCategories.First(e => e.TransactionCategoryId == data.TransactionCategoryId).AlternativeName
                         </Template>
-                    </RadzenGridColumn>
-                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="Amount" Title="Amount" />
-                    <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
-                    <RadzenGridColumn Width="80px" TItem="MoneySaver.SPA.Models.Transaction" Title="" Filterable="false" Sortable="false">
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="Amount" Title="Amount" />
+                    <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
+                    <RadzenDataGridColumn Width="80px" TItem="MoneySaver.SPA.Models.Transaction" Title="" Filterable="false" Sortable="false">
                         <Template Context="transaction">
                             <RadzenButton Click="@((args) => UpdateTransaction(transaction.Id))" Icon="edit" ButtonStyle="Radzen.ButtonStyle.Secondary" />
                             <RadzenButton Click="@((args) => DeleteOperation(transaction.Id))" Icon="close" ButtonStyle="Radzen.ButtonStyle.Danger" />
                         </Template>
-                    </RadzenGridColumn>
+                    </RadzenDataGridColumn>
             </Columns>
-        </RadzenGrid>
+        </RadzenDataGrid>
    }
     <TransactionDialog @ref="TransactionDialog" CloseEventCallback="@OnDialogClose" TransactionCategories="@TransactionCategories.ToArray()"></TransactionDialog>
     <ConfirmationDialog @ref="ConfirmationDialog" CloseEventCallback="@OnDialogClose" ProceedEventCallback="@DeleteTransaction" />

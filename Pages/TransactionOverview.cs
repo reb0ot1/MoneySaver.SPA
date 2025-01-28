@@ -9,7 +9,7 @@ namespace MoneySaver.SPA.Pages
 {
     public partial class TransactionOverview
     {
-        protected RadzenGrid<Transaction> grid;
+        protected RadzenDataGrid<Transaction> grid;
 
         [Inject]
         public NavigationManager navigation { get; set; }

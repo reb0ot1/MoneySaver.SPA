@@ -8,6 +8,8 @@ using MoneySaver.SPA.Models.Configurations;
 using MoneySaver.SPA.Services;
 using Polly;
 using Polly.Extensions.Http;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -20,6 +22,7 @@ builder.Services.Configure<SpaSettings>(spaConfig);
 //builder.Services.AddSingleton(spaSettings);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddBlazoredLocalStorage();
+
 builder.Services.AddAuthorizationCore();
 
 builder.Services.AddHttpClient("apiCallsTransactions", client => 

@@ -22,15 +22,15 @@
     {
         <div class="row">
             <div class="col-md-12">
-                <RadzenGrid AllowFiltering="false" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="false"
+                <RadzenDataGrid AllowFiltering="false" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="false"
                     AllowSorting="true" Data="@BudgetComponentModel.BudgetItems" TItem="MoneySaver.SPA.Models.BudgetItemModel" AllowColumnResize="false">
                     <Columns>
-                        <RadzenGridColumn Width="300px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="TransactionCategory" Title="Category" Filterable="false" Sortable="false">
+                        <RadzenDataGridColumn Width="300px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="TransactionCategory" Title="Category" Filterable="false" Sortable="false">
                             <Template Context="data">
                                 @data.TransactionCategory.AlternativeName
                             </Template>
-                        </RadzenGridColumn>
-                        <RadzenGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="Progress" Width="400px" TextAlign="Radzen.TextAlign.Right" Title="Progress" Filterable="false" Sortable="false">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="Progress" Width="400px" TextAlign="Radzen.TextAlign.Right" Title="Progress" Filterable="false" Sortable="false">
                             <Template Context="data">
                                 <div class="progress">
                                     <div class="progress-bar @BudgetComponent.CheckLevel(data.Progress)"
@@ -45,8 +45,8 @@
                             <FooterTemplate>
                                 <b>Total: </b>
                             </FooterTemplate>
-                        </RadzenGridColumn>
-                        <RadzenGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="LimitAmmount" Title="Amount" TextAlign="Radzen.TextAlign.Right">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="LimitAmmount" Title="Amount" TextAlign="Radzen.TextAlign.Right">
                             <Template Context="data">
 
                                 @string.Format("{0:0.00}", data.LimitAmount)
@@ -54,16 +54,16 @@
                             <FooterTemplate>
                                 @string.Format("{0:0.00}", BudgetComponentModel.LimitAmount)
                             </FooterTemplate>
-                        </RadzenGridColumn>
-                        <RadzenGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="SpentAmmount" Title="Spent" TextAlign="Radzen.TextAlign.Right">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="SpentAmmount" Title="Spent" TextAlign="Radzen.TextAlign.Right">
                             <Template Context="data">
                                 @string.Format("{0:0.00}", data.SpentAmount)
                             </Template>
                             <FooterTemplate>
                                 @string.Format("{0:0.00}", BudgetComponentModel.TotalSpentAmmount)
                             </FooterTemplate>
-                        </RadzenGridColumn>
-                        <RadzenGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="Left" TextAlign="Radzen.TextAlign.Right">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="Left" TextAlign="Radzen.TextAlign.Right">
                             <Template Context="data">
                                 @{
                                     var amountLeft = data.LimitAmount - data.SpentAmount;
@@ -75,16 +75,16 @@
                             <FooterTemplate>
                                 @string.Format("{0:0.00}", BudgetComponentModel.TotalLeftAmount)
                             </FooterTemplate>
-                        </RadzenGridColumn>
-                        <RadzenGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
-                        <RadzenGridColumn Width="100px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="" Filterable="false" Sortable="false">
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.Transaction" Property="AdditionalNote" Filterable="false" Sortable="false" Title="Notes" />
+                        <RadzenDataGridColumn Width="100px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="" Filterable="false" Sortable="false">
                             <Template Context="budgetItem">
                                 <RadzenButton Click="@(() => EditItem(budgetItem))" Icon="edit" ButtonStyle="Radzen.ButtonStyle.Secondary" />
                                 <RadzenButton Click="@(()=> RemoveItem(budgetItem.Id))" Icon="close" ButtonStyle="Radzen.ButtonStyle.Danger" />
                             </Template>
-                        </RadzenGridColumn>
+                        </RadzenDataGridColumn>
                     </Columns>
-                </RadzenGrid>
+                </RadzenDataGrid>
             </div>
 
             <BudgetItemDialog @ref="BudgetItemDialog" CloseEventCallback="@AddItem_OnDialogClose" BudgetId="@BudgetComponentModel.Id" ТransactionCategories="@TransactionCategories.ToArray()"></BudgetItemDialog>

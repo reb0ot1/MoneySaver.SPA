@@ -19,7 +19,7 @@
                             <div class="form-group">
                                 <label for="transactionDate">Transaction date: </label>
                                 <div>
-                                    <RadzenDatePicker id="transactionDate" @bind-Value="@Transaction.TransactionDate" DateFormat="@Constants.DATE_FORMAT" />
+                                    <RadzenDatePicker id="transactionDate"  @bind-Value="@Transaction.TransactionDate" DateFormat="@Constants.DATE_FORMAT" ShowCalendarWeek />
                                     <ValidationMessage For="@(() => Transaction.TransactionDate)" />
                                 </div>
                             </div>

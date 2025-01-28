@@ -16,7 +16,7 @@ namespace MoneySaver.SPA.Pages
 
         protected bool ShowBudgets = true;
 
-        protected RadzenGrid<BudgetResponseModel> grid;
+        protected RadzenDataGrid<BudgetResponseModel> grid;
 
         public int TotalCount { get; set; }
 
@@ -60,7 +60,7 @@ namespace MoneySaver.SPA.Pages
         public void CreateBudget()
         {
             BudgetDialog.Show(Models.Enums.CommandType.Add);
-        }
+        }  
 
         public async Task OnDialogClose(bool result)
         {

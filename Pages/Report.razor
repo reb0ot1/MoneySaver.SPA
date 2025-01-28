@@ -70,7 +70,7 @@
                 <div>
                     <label for="">Categories: </label><br />
                     <RadzenDropDown Multiple="true" Chips="true" MaxSelectedLabels="20" AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Data=@CategoryRecords @bind-Value=@CategoryIdsSelected
-                                TextProperty="AlternativeName" ValueProperty="TransactionCategoryId" DisabledProperty="Discontinued" Change=@(args => OnCategoryDropDownChange()) Class="w-100" />
+                                TextProperty="AlternativeName" ValueProperty="TransactionCategoryId" Change=@(args => OnCategoryDropDownChange()) Class="w-100" />
                 </div>
                 <div class="card-body">
                     <LineChart @ref="LineChartForExpesesByPeriodForCategory" Data="@ExpensesByPeriodForCategoriesChartData" ChartName="Expenses by period per category" ChartContainer="lineChart2" />
@@ -80,4 +80,3 @@
         </div>
     }
 </div>
-
