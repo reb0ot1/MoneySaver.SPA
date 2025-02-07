@@ -1,6 +1,8 @@
 ﻿using MoneySaver.SPA.Components;
 using MoneySaver.SPA.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using MoneySaver.SPA.Exceptions;
 using MoneySaver.SPA.Services;
 using Radzen;
 using Radzen.Blazor;
@@ -10,12 +12,6 @@ namespace MoneySaver.SPA.Pages
     public partial class TransactionOverview
     {
         protected RadzenDataGrid<Transaction> grid;
-
-        [Inject]
-        public NavigationManager navigation { get; set; }
-
-        [Inject]
-        public IAuthenticationService AuthenticationService { get; set; }
 
         public IEnumerable<Transaction> Transactions { get; set; }
 

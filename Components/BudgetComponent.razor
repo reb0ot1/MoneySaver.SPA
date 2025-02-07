@@ -23,14 +23,14 @@
         <div class="row">
             <div class="col-md-12">
                 <RadzenDataGrid AllowFiltering="false" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="false"
-                    AllowSorting="true" Data="@BudgetComponentModel.BudgetItems" TItem="MoneySaver.SPA.Models.BudgetItemModel" AllowColumnResize="false">
+                    AllowSorting="false" Data="@BudgetComponentModel.BudgetItems" TItem="MoneySaver.SPA.Models.BudgetItemModel" AllowColumnResize="false">
                     <Columns>
                         <RadzenDataGridColumn Width="300px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="TransactionCategory" Title="Category" Filterable="false" Sortable="false">
                             <Template Context="data">
                                 @data.TransactionCategory.AlternativeName
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="Progress" Width="400px" TextAlign="Radzen.TextAlign.Right" Title="Progress" Filterable="false" Sortable="false">
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="Progress" Width="400px" Title="Progress" Filterable="false" Sortable="false">
                             <Template Context="data">
                                 <div class="progress">
                                     <div class="progress-bar @BudgetComponent.CheckLevel(data.Progress)"
@@ -46,7 +46,7 @@
                                 <b>Total: </b>
                             </FooterTemplate>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="LimitAmmount" Title="Amount" TextAlign="Radzen.TextAlign.Right">
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="LimitAmmount" Title="Amount" >
                             <Template Context="data">
 
                                 @string.Format("{0:0.00}", data.LimitAmount)
@@ -55,7 +55,7 @@
                                 @string.Format("{0:0.00}", BudgetComponentModel.LimitAmount)
                             </FooterTemplate>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="SpentAmmount" Title="Spent" TextAlign="Radzen.TextAlign.Right">
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="SpentAmmount" Title="Spent" >
                             <Template Context="data">
                                 @string.Format("{0:0.00}", data.SpentAmount)
                             </Template>
@@ -63,7 +63,7 @@
                                 @string.Format("{0:0.00}", BudgetComponentModel.TotalSpentAmmount)
                             </FooterTemplate>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="Left" TextAlign="Radzen.TextAlign.Right">
+                        <RadzenDataGridColumn TItem="MoneySaver.SPA.Models.BudgetItemModel" Title="Left" >
                             <Template Context="data">
                                 @{
                                     var amountLeft = data.LimitAmount - data.SpentAmount;

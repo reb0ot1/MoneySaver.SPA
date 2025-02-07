@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MoneySaver.SPA.Components;
+using MoneySaver.SPA.Exceptions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Response;
 using MoneySaver.SPA.Services;
@@ -26,9 +27,6 @@ namespace MoneySaver.SPA.Pages
 
         [Inject]
         public ICategoryService CategoryService { get; set; }
-
-        [Inject]
-        public NavigationManager Navigation { get; set; }
 
         [Inject]
         public IAuthenticationService AuthenticationService { get; set; }

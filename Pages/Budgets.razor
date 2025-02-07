@@ -31,7 +31,7 @@ else
         </button>*@
 
             <RadzenDataGrid @ref="grid" AllowFiltering="false" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadGridData"
-            AllowSorting="true" Data="@BudgetsList" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" ColumnWidth="200px">
+            AllowSorting="false" Data="@BudgetsList" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" ColumnWidth="200px">
                 <Columns>
                     <RadzenDataGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Budget name">
                         <Template Context="data">
@@ -45,7 +45,7 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="End date">
                         <Template Context="data">
-                            @data.EndDate.ToString(Constants.DATE_FORMAT) - @data.EndDate.ToString(Constants.DATE_FORMAT)
+                            @data.EndDate.ToString(Constants.DATE_FORMAT)
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Budget type">

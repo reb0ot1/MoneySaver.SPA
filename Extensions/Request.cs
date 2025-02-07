@@ -5,7 +5,7 @@ namespace MoneySaver.SPA.Extensions
 {
     public static class RequestContent
     {
-        public static StringContent CreateContent<T>(T entity) where T : class
+        public static StringContent CreateContent<T>(T entity)
         { 
             return new StringContent(
                 JsonSerializer.Serialize(entity),

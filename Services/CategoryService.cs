@@ -1,43 +1,28 @@
-﻿using Microsoft.Extensions.Options;
-using MoneySaver.SPA.Extensions;
+﻿using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
-using MoneySaver.SPA.Models.Configurations;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace MoneySaver.SPA.Services
 {
     public class CategoryService : ICategoryService
     {
-        private HttpClient httpClient;
-        private Uri uri;
+        private readonly IApiCallsService _apiCallsService;
 
-        public CategoryService(HttpClient httpClient, IOptions<SpaSettings> spaSettingConfiguration)
+        public CategoryService( IApiCallsService apiCallsService)
         {
-            this.uri = new Uri(spaSettingConfiguration.Value.DataApiAddress);
-            this.httpClient = httpClient;
+            this._apiCallsService = apiCallsService;
         }
 
         public async Task AddCategory(TransactionCategory category)
         {
-            var categoryItemJson = RequestContent.CreateContent(category);
-
-            //TODO: Add Http policy
-            var response = await this.httpClient.PostAsync(new Uri(this.uri, "api/category"), categoryItemJson);
-            if (response.IsSuccessStatusCode)
-            {
-                await JsonSerializer.DeserializeAsync<TransactionCategory>(await response.Content.ReadAsStreamAsync());
-            }
+            var response = await this._apiCallsService.PostAsync<TransactionCategory, TransactionCategory>("api/category", category);
+            //TODO: Should return result;
         }
 
         public async Task<IEnumerable<TransactionCategory>> GetAllAsync()
         {
-            //TODO: Add Http policy
-            IEnumerable<TransactionCategory> result = new List<TransactionCategory>();
-            result = await httpClient.GetFromJsonAsync<IEnumerable<TransactionCategory>>(new Uri(this.uri, "api/category"));
+            var response = await this._apiCallsService.GetAsync<IEnumerable<TransactionCategory>>("api/category");
 
-            return result;
+            return response;
         }
 
         public async Task<IEnumerable<TransactionCategory>> GetAllPreparedForVisualizationAsync()
@@ -51,6 +36,7 @@ namespace MoneySaver.SPA.Services
                 var children = resultDb
                     .Where(w => w.ParentId == parentCategory.TransactionCategoryId)
                     .ToList();
+                
                 if (children.Any())
                 {
                     foreach (var item in children)
@@ -67,13 +53,9 @@ namespace MoneySaver.SPA.Services
 
         public async Task UpdateCategory(TransactionCategory category)
         {
-            var categoryItemJson = RequestContent.CreateContent(category);
             //TODO: Add Http policy
-            var response = await this.httpClient.PutAsync(new Uri(this.uri, "api/category"), categoryItemJson);
-            if (response.IsSuccessStatusCode)
-            {
-                await JsonSerializer.DeserializeAsync<TransactionCategory>(await response.Content.ReadAsStreamAsync());
-            }
+            var response = await this._apiCallsService.PutAsync<TransactionCategory, TransactionCategory>("api/category", category);
+            //TODO: Should return result;
         }
     }
 }

@@ -1,72 +1,38 @@
-﻿using Microsoft.Extensions.Options;
-using MoneySaver.SPA.Extensions;
+﻿using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
-using MoneySaver.SPA.Models.Configurations;
 using MoneySaver.SPA.Models.Response;
-using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace MoneySaver.SPA.Services
 {
     public class BudgetService : IBudgetService
     {
-        private HttpClient httpClient;
-        private Uri uri;
         private const string BaseApiPath = "api/budget";
+        private readonly IApiCallsService _apiCallsService;
 
-        public BudgetService(HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
+        public BudgetService(IApiCallsService apiCallsService)
         {
-            this.uri = new Uri(spaSettingsConfiguration.Value.DataApiAddress);
-            this.httpClient = httpClient;
+            this._apiCallsService = apiCallsService;
         }
-
 
         //TODO: Needs to be refactored. Get only the budget in use. The items gathering should be a different method
         public async Task<BudgetViewModel> GetBudgetInUseAsync()
         {
-            var budgetInUserRequest = await httpClient.GetFromJsonAsync<BudgetResponseModel>(new Uri(this.uri, $"{BaseApiPath}/inuse"));
-            if (budgetInUserRequest == null)
-            {
-                //TODO: Use model for returning results
-                return null;
-            }
-
-            //var uri = new Uri(this.uri, $"{BaseApiPath}/{budgetInUserRequest.Id}/items");
-            //var budgetInUseItems = await httpClient.GetFromJsonAsync<IEnumerable<BudgetItemResponseModel>>(uri);
-
+            var budgetInUse = await this._apiCallsService.GetAsync<BudgetResponseModel>($"{BaseApiPath}/inuse");
+            
             var budgetModel = new BudgetViewModel
             {
-                Id = budgetInUserRequest.Id,
-                StartDate = budgetInUserRequest.StartDate,
-                EndDate = budgetInUserRequest.EndDate,
-                IsInUse = budgetInUserRequest.IsInUse
-                //BudgetItems = budgetInUseItems.Select(entity => new BudgetItemModel { 
-                //    Id = entity.Id,
-                //    BudgetId = budgetInUserRequest.Id,
-                //    LimitAmount= entity.LimitAmount,
-                //    Progress = entity.Progress,
-                //    SpentAmount= entity.SpentAmount,
-                //    TransactionCategoryId = entity.TransactionCategoryId,
-                //    TransactionCategoryName = entity.TransactionCategoryName
-                //}).OrderBy(o => o.TransactionCategoryName).ToArray()
+                Id = budgetInUse.Id,
+                StartDate = budgetInUse.StartDate,
+                EndDate = budgetInUse.EndDate,
+                IsInUse = budgetInUse.IsInUse
             };
-
-            //budgetModel.LimitAmount = budgetModel.BudgetItems.Sum(s => s.LimitAmount);
-            //budgetModel.TotalSpentAmmount = budgetModel.BudgetItems.Sum(s => s.SpentAmount);
-            //budgetModel.TotalLeftAmount = budgetModel.LimitAmount - budgetModel.TotalSpentAmmount;
 
             return budgetModel;
         }
 
         public async Task<IEnumerable<BudgetItemModel>> GetBudgetItemsAsync(int budgetId)
         {
-            var uri = new Uri(this.uri, $"{BaseApiPath}/{budgetId}/items");
-            var budgetInUseItems = await httpClient.GetFromJsonAsync<IEnumerable<BudgetItemResponseModel>>(uri);
-
-            if (budgetInUseItems is null)
-            {
-                return new List<BudgetItemModel>();
-            }
+            var budgetInUseItems = await _apiCallsService.GetAsync<IEnumerable<BudgetItemResponseModel>>($"{BaseApiPath}/{budgetId}/items");
 
             return budgetInUseItems.Select(entity => new BudgetItemModel
             {
@@ -82,101 +48,58 @@ namespace MoneySaver.SPA.Services
 
         public async Task<BudgetResponseModel> GetBudgetAsync(int budgetId)
         { 
-            var budgetRequest = await httpClient.GetFromJsonAsync<BudgetResponseModel>(new Uri(this.uri, $"{BaseApiPath}/{budgetId}"));
-            if (budgetRequest == null)
-            {
-                //TODO: Use model for returning results
-                return null;
-            }
+            var budgetRequest = await _apiCallsService.GetAsync<BudgetResponseModel>($"{BaseApiPath}/{budgetId}");
 
             return budgetRequest;
         }
 
         public async Task AddBudgetItem(int budgetId, BudgetItemModel budgetItem)
         {
-            var budgetItemJson = RequestContent.CreateContent(budgetItem);
+            var response = await this._apiCallsService.PostAsync<BudgetItemModel, BudgetItemModel>($"{BaseApiPath}/{budgetId}/additem", budgetItem);
 
-            var response = await this.httpClient.PostAsync(new Uri(this.uri, $"{BaseApiPath}/{budgetId}/additem"), budgetItemJson);
-            if (response.IsSuccessStatusCode)
-            {
-                await JsonSerializer.DeserializeAsync<BudgetItemModel>(await response.Content.ReadAsStreamAsync());
-            }
+            //TODO: Return response
         }
 
         public async Task UpdateBudgetItem(int budgetId, BudgetItemModel budgetItem)
         {
-            var budgetItemJson = RequestContent.CreateContent(budgetItem);
-
-            await this.httpClient.PutAsync(new Uri(this.uri, $"{BaseApiPath}/{budgetId}/updateitem/{budgetItem.Id}"), budgetItemJson);
+            var result = await this._apiCallsService.PutAsync<BudgetItemModel, BudgetItemModel>($"{BaseApiPath}/{budgetId}/updateitem/{budgetItem.Id}", budgetItem);
+            
+            //TODO: Return result;
         }
 
-        public async Task RemoveBudgetItem(int budgetId, int itemId)
-        {
-            var uri = new Uri(this.uri, $"{BaseApiPath}/{budgetId}/removeitem/{itemId}");
-            var response = await this.httpClient.DeleteAsync(uri);
-        }
+        public Task RemoveBudgetItem(int budgetId, int itemId)
+            => this._apiCallsService.DeleteAsync($"{BaseApiPath}/{budgetId}/removeitem/{itemId}");
 
         public async Task<PageResponseModel<BudgetResponseModel>> GetBudgetsPerPageAsync(int page, int itemsPerPage)
         {
-            var uri = new Uri(this.uri, $"{BaseApiPath}/all?pageSize={itemsPerPage}&page={page}");
-            var response = await httpClient.GetAsync(uri);
-            PageResponseApiModel<BudgetResponseApiModel> result = null;
-            if (response.IsSuccessStatusCode)
+            var response = await _apiCallsService.GetAsync<PageResponseApiModel<BudgetResponseApiModel>>($"{BaseApiPath}/all?pageSize={itemsPerPage}&page={page}");
+
+            return new PageResponseModel<BudgetResponseModel>
             {
-                using var responseResult = await response.Content.ReadAsStreamAsync();
-
-                result = await JsonSerializer.DeserializeAsync<PageResponseApiModel<BudgetResponseApiModel>>(responseResult);
-
-                return new PageResponseModel<BudgetResponseModel>
+                TotalCount = response.TotalCount,
+                Result = response.Result.Select(e => new BudgetResponseModel
                 {
-                    TotalCount = result.TotalCount,
-                    Result = result.Result.Select(e => new BudgetResponseModel
-                    {
-                        Id = e.Id,
-                        EndDate = e.EndDate,
-                        StartDate = e.StartDate,
-                        Name = e.Name,
-                        BudgetType = e.BudgetType,
-                        IsInUse = e.IsInUse
-                    })
-                    .ToList()
-                };
-            }
-
-            //TODO: Should use Result class
-            return new PageResponseModel<BudgetResponseModel>();
+                    Id = e.Id,
+                    EndDate = e.EndDate,
+                    StartDate = e.StartDate,
+                    Name = e.Name,
+                    BudgetType = e.BudgetType,
+                    IsInUse = e.IsInUse
+                })
+                .ToList()
+            };
         }
 
         public async Task<BudgetResponseModel> CreateBudgetAsync(BudgetModel budgetModel)
         {
-            var budgetItemJson = RequestContent.CreateContent(budgetModel);
-            var response = await this.httpClient.PostAsync(new Uri(this.uri, $"{BaseApiPath}/add"), budgetItemJson);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseResult = await response.Content.ReadAsStreamAsync();
-                var result = await JsonSerializer.DeserializeAsync<BudgetResponseModel>(responseResult);
-
-                return result;
-            }
-
-            return null;
+            var response = await this._apiCallsService.PostAsync<BudgetModel, BudgetResponseModel>($"{BaseApiPath}/add", budgetModel);
+            return response;
         }
 
         public async Task<BudgetResponseModel> UpdateBudgetAsync(BudgetModel budgetModel)
         {
-            var budgetItemJson = RequestContent.CreateContent(budgetModel);
-            var response = await this.httpClient.PutAsync(new Uri(this.uri, $"{BaseApiPath}/{budgetModel.Id}"), budgetItemJson);
-
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseResult = await response.Content.ReadAsStreamAsync();
-                var result = await JsonSerializer.DeserializeAsync<BudgetResponseModel>(responseResult);
-
-                return result;
-            }
-
-            return null;
+            var response = await this._apiCallsService.PutAsync<BudgetModel, BudgetResponseModel>($"{BaseApiPath}/{budgetModel.Id}", budgetModel);
+            return response;
         }
     }
 }

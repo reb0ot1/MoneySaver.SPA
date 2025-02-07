@@ -70,7 +70,7 @@ namespace MoneySaver.SPA.Services
             return true;
         }
 
-        public async Task Logout()
+        public async Task LogoutAsync()
         {
             await _localStorage.RemoveItemAsync("authToken");
             ((AuthStateProvider)_authStateProvider).NotifyUserLogout();

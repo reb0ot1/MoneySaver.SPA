@@ -6,7 +6,7 @@ namespace MoneySaver.SPA.Services
     {
         Task<ServiceResult<bool>> RegisterUser(UserForRegistration userForRegistration);
         Task<AuthResponseDto> Login(UserForAuthenticationDto userForAuthenticationDto);
-        Task Logout();
+        Task LogoutAsync();
         Task<bool> UserIsLogged();
     }
 }

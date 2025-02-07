@@ -55,6 +55,7 @@ builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReportDataService, ReportsDataService>();
+builder.Services.AddScoped<IApiCallsService, ApiCallsService>();
 
 await builder.Build().RunAsync();
 
@@ -76,7 +77,7 @@ public class CustomeAuthorization : DelegatingHandler
         var token = await this._localStorage.GetItemAsStringAsync("authToken");
         if (token == null)
         {
-            await this._authStateProvider.Logout();
+            await this._authStateProvider.LogoutAsync();
             return new HttpResponseMessage(System.Net.HttpStatusCode.Unauthorized);
         }
 

@@ -11,86 +11,44 @@ namespace MoneySaver.SPA.Services
 {
     public class ReportsDataService : IReportDataService
     {
-        private HttpClient httpClient;
-        private Uri uri;
-
-        public ReportsDataService(HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
+        private readonly IApiCallsService _apiCallsService;
+        public ReportsDataService(IApiCallsService apiCallsService)
         {
-            this.uri = new Uri(spaSettingsConfiguration.Value.DataApiAddress);
-            this.httpClient = httpClient;
+            this._apiCallsService = apiCallsService;
         }
 
         public async Task<List<DataItem>> GetExpensesPerCategoryAsync(FilterViewModel filter)
         {
-            var uri = new Uri(this.uri, "api/reports/expenses");
-            var result = new List<DataItem>();
-            var filterJson = RequestContent.CreateContent(filter);
+            var response = await this._apiCallsService.PostAsync<FilterViewModel, List<DataItem>>("api/reports/expenses", filter);
 
-            var response = await this.httpClient.PostAsync(uri, filterJson);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseResult = await response.Content.ReadFromJsonAsync<List<DataItem>>();
-                result = responseResult;
-            }
-
-            return result;
+            return response;
         }
 
         public async Task<LineChartDataModel> GetExpensesByPeriodPerCategoryAsync(FilterViewModel filter)
         {
-            var uri = new Uri(this.uri, "api/reports/expensesbycategories");
-            var result = new LineChartDataModel();
-            var filterJson = RequestContent.CreateContent(filter);
+            var response = await this._apiCallsService.PostAsync<FilterViewModel, LineChartDataModel>("api/reports/expensesbycategories", filter);
 
-            var response = await this.httpClient.PostAsync(uri, filterJson);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseResult = await response.Content.ReadFromJsonAsync<LineChartDataModel>();
-                result = responseResult;
-            }
-
-            return result;
+            return response;
         }
 
         public async Task<LineChartDataModel> GetExpensesPerMonth(FilterViewModel filter)
         {
-            var uri = new Uri(this.uri, "api/reports/expensesperiod");
-            var result = new LineChartDataModel { Categories = new string[] { }, Series = new List<SeriesItemModel>() };
-            var filterJson = RequestContent.CreateContent(filter);
-
-            var response = await this.httpClient.PostAsync(uri, filterJson);
-
-            if (response.IsSuccessStatusCode)
-            {
-                var responseResult = await response.Content.ReadFromJsonAsync<LineChartDataModel>();
-                result = responseResult;
-            }
-
-            return result;
+            var response = await this._apiCallsService.PostAsync<FilterViewModel, LineChartDataModel>("api/reports/expensesperiod", filter);
+            return response;
         }
 
         public async Task<IEnumerable<IdAndValue<double?>>> GetSpentAmountByCategory(DateTime start, DateTime end, int? itemsToTake)
         {
-            List<IdAndValue<double?>> result = new List<IdAndValue<double?>>();
-            var request = RequestContent.CreateContent(new PageRequestModel{ ItemsPerPage = itemsToTake??0, Filter = new FilterRequestModel { From = start, To = end } });
-            var uri = new Uri(this.uri, "api/reports/spentAmountByCategory");
-            var response = await this.httpClient.PostAsync(uri, request);
-            if (response.IsSuccessStatusCode)
+            var request = new PageRequestModel
             {
-                using (var responseResult = await response.Content.ReadAsStreamAsync())
-                {
-                    result = await JsonSerializer.DeserializeAsync<List<IdAndValue<double?>>>(
-                        responseResult,
-                        new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }
-                        );
-                }
-            }
-
+                ItemsPerPage = itemsToTake ?? 0,
+                Filter = new FilterRequestModel { From = start, To = end }
+            };
+            
+            var response = await this._apiCallsService.PostAsync<PageRequestModel, List<IdAndValue<double?>>>("api/reports/spentAmountByCategory", request);
+            
             //TODO: Add logging if response is not valid
-
-            return result.OrderByDescending(e => e.Value);
+            return response.OrderByDescending(e => e.Value);
         }
     }
 }

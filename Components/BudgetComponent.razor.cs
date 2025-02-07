@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MoneySaver.SPA.Exceptions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Enums;
 using MoneySaver.SPA.Services;
@@ -20,8 +21,6 @@ namespace MoneySaver.SPA.Components
 
         protected BudgetItemDialog BudgetItemDialog { get; set; }
 
-        //protected BudgetItemModel[] BudgetItems { get; set; } = new BudgetItemModel[] { };
-
         public BudgetViewModel BudgetComponentModel { get; set; }
 
         protected async override Task OnInitializedAsync()
@@ -37,8 +36,6 @@ namespace MoneySaver.SPA.Components
                 };
 
                 await this.UpdateCompoment();
-
-                //StateHasChanged();
             }
         }
 
@@ -52,7 +49,7 @@ namespace MoneySaver.SPA.Components
         {
             var currentlyInUseBudget = await this.BudgetService.GetBudgetInUseAsync();
             var currentlyInUseBudgetItems = await this.BudgetService.GetBudgetItemsAsync(currentlyInUseBudget.Id);
-            
+        
             //TODO: Use bulk request
             foreach (var budgetItem in currentlyInUseBudgetItems)
             {
@@ -85,6 +82,7 @@ namespace MoneySaver.SPA.Components
         {
             await this.BudgetService.RemoveBudgetItem(this.BudgetModel.Id, id);
             await this.UpdateCompoment();
+            
             StateHasChanged();
         }
 
@@ -127,7 +125,7 @@ namespace MoneySaver.SPA.Components
                     continue;
                 }
                 var categoryToFind = this.TransactionCategories
-                       .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
+                    .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
 
 
                 item.TransactionCategory = new TransactionCategory { 
@@ -141,6 +139,7 @@ namespace MoneySaver.SPA.Components
             this.BudgetComponentModel.BudgetItems = testItems
                 .OrderBy(e => e.TransactionCategory?.AlternativeName)
                 .ToArray();
+            
         }
     }
 }

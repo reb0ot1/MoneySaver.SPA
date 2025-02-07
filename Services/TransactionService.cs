@@ -1,106 +1,62 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Net;
+using Microsoft.Extensions.Options;
 using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
 using MoneySaver.SPA.Models.Enums;
 using System.Text.Json;
+using MoneySaver.SPA.Exceptions;
+using MoneySaver.SPA.Models.Request;
 
 namespace MoneySaver.SPA.Services
 {
     public class TransactionService : ITransactionService
     {
-        private string baseUrl;
-        private HttpClient httpClient;
-        private HttpClient httpClient2;
-        public TransactionService(IHttpClientFactory httpClientFactory, HttpClient httpClient, IOptions<SpaSettings> spaSettingsConfiguration)
+        private readonly IApiCallsService _apiCallsService;
+        public TransactionService(
+            IApiCallsService apiCallsService)
         {
-            this.httpClient2 = httpClientFactory.CreateClient("apiCallsTransactions");
-            this.httpClient = httpClient;
-            this.baseUrl = spaSettingsConfiguration.Value.DataApiAddress + "api/transaction";
+            this._apiCallsService = apiCallsService;
         }
 
         public async Task<TransactionsPageModel> GetForPage(int itemsToSkip, int itemsPerPage, string search)
         {
-            var transactionJson = RequestContent.CreateContent(new { ItemsToSkip = itemsToSkip, ItemsPerPage = itemsPerPage, Filter = new { SearchText = search } });
+            var transactionJson = new PageRequestModel { ItemsToSkip = itemsToSkip, ItemsPerPage = itemsPerPage, Filter = new FilterRequestModel { SearchText = search }};
 
-            try
-            {
-                var response = await this.httpClient2.PostAsync($"api/transaction/page", transactionJson);
-                if (response.IsSuccessStatusCode)
-                {
-                    TransactionsPageModel result = null;
-                    using (var responseResult = await response.Content.ReadAsStreamAsync())
-                    {
-                        result = await JsonSerializer.DeserializeAsync<TransactionsPageModel>(responseResult, new JsonSerializerOptions()
-                        {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-                        });
-                    }
+            var response = await this._apiCallsService.PostAsync<PageRequestModel, TransactionsPageModel>($"api/transaction/page", transactionJson);
 
-                    return result;
-                }
-            }
-            catch (Exception ex)
-            {
-
-            }
-
-           return null;
+            return response;
         }
 
         public async Task<Transaction> AddAsync(Transaction transaction)
         {
-            var transactionJson = RequestContent.CreateContent(transaction);
-
-            var response = await this.httpClient.PostAsync(baseUrl, transactionJson);
-            if (response.IsSuccessStatusCode)
-            {
-                using var responseResult = await response.Content.ReadAsStreamAsync();
-                return await JsonSerializer.DeserializeAsync<Transaction>(responseResult);
-            }
-
-            return null;
+            var response = await this._apiCallsService.PostAsync<Transaction, Transaction>("api/transaction", transaction);
+            
+            return response;
         }
 
         public async Task<IEnumerable<Transaction>> AddManyAsync(IEnumerable<Transaction> transactions)
         {
-            var tasks = new List<Task<HttpResponseMessage>>();
+            var tasks = new List<Task<Transaction>>();
             foreach (var transaction in transactions)
             {
-                var transactionJson = RequestContent.CreateContent(transaction);
-
-                var response = this.httpClient.PostAsync(baseUrl, transactionJson);
+                var response = this._apiCallsService.PostAsync<Transaction, Transaction>("api/transaction", transaction);
                 tasks.Add(response);
             }
 
-            await Task.WhenAll<HttpResponseMessage>(tasks);
+            await Task.WhenAll(tasks);
 
-            var result = new List<Transaction>();
-
-            foreach (var task in tasks)
-            {
-                if (task.Result.IsSuccessStatusCode)
-                {
-                    using var responseResult = await task.Result.Content.ReadAsStreamAsync();
-                    var deserializeResult = await JsonSerializer.DeserializeAsync<Transaction>(responseResult);
-
-                    result.Add(deserializeResult);
-                }
-            }
-
-            return result;
+            return tasks.Select(task => task.Result).ToList();
         }
 
         public async Task UpdateAsync(Transaction transaction)
         {
-            var transactionJson = RequestContent.CreateContent(transaction);
-
-            await this.httpClient.PutAsync(baseUrl, transactionJson);
+            var result = await this._apiCallsService.PutAsync<Transaction, Transaction>("api/transaction", transaction);
         }
 
         public async Task DeleteAsync(string transactionId)
         {
-            await this.httpClient.GetAsync($"{baseUrl}/remove/{transactionId}");
+            await this._apiCallsService.DeleteAsync($"api/transaction/remove/{transactionId}");
         }
     }
 }

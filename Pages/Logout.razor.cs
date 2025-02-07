@@ -11,7 +11,7 @@ namespace MoneySaver.SPA.Pages
         public NavigationManager NavigationManager { get; set; }
         protected override async Task OnInitializedAsync()
         {
-            await AuthenticationService.Logout();
+            await AuthenticationService.LogoutAsync();
             NavigationManager.NavigateTo("/");
         }
     }
