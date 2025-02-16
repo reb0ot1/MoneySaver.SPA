@@ -70,8 +70,18 @@ namespace MoneySaver.SPA.Pages
         protected async Task ShowBudgetItem(int budgetId)
         {
             await GetBudgetComponentDataAsync(budgetId);
+            if (this.BudgetComponent is not null && this.BudgetComponent.BudgetComponentModel is null)
+            {
+                this.BudgetComponent.BudgetComponentModel =  new BudgetViewModel
+                {
+                    Id = this.BudgetModel.Id,
+                    StartDate = this.BudgetModel.StartDate,
+                    EndDate = this.BudgetModel.EndDate,
+                    IsInUse = this.BudgetModel.IsInUse
+                };
+            }
+            
             StateHasChanged();
-
             await this.BudgetComponent.Refresh();
 
             this.ShowBudgets = false;

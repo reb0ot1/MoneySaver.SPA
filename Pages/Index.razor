@@ -3,36 +3,49 @@
 @attribute [Authorize]
 <AuthorizeView>
     <Authorized>
-        <h3>@Name</h3>
-        @*<div class="container">*@
+        @if (CategoriesSpentAmount is null || Transactions is null)
+        {
+            //TODO: Set it as component
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <h3>@Name</h3>
+            @*<div class="container">*@
             <div class="row">
                 <div class="col-6">
-                <b>Top categories spent amount</b> @if (CategoriesSpentAmount.Any())
-                {
-                    <span>(@this.StartDate.ToString(Constants.DATE_FORMAT) - @this.EndDate.ToString(Constants.DATE_FORMAT))</span>
-                }
-                @if (CategoriesSpentAmount.Any())
-                {
-                    <ol class="list-group list-group-numbered">
-                        @foreach (var category in CategoriesSpentAmount)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="ms-2 me-auto">
-                                    @category.Name
-                                </div>
-                            <span><b>@category.Amount</b></span>
-                                @*<span class="badge bg-primary rounded-pill">@category.Amount</span>*@
-                            </li>
-                        }
-                    </ol>
-                }
-                else
-                {   //TODO: User resources
-                    <div><b>No amount spent</b></div>
-                }
+                    <b>Top categories spent amount</b>
+                    @if (CategoriesSpentAmount.Any())
+                    {
+                        <span>(@this.StartDate.ToString(Constants.DATE_FORMAT) - @this.EndDate.ToString(Constants.DATE_FORMAT))</span>
+                    }
+                    @if (CategoriesSpentAmount.Any())
+                    {
+                        <ol class="list-group list-group-numbered">
+                            @foreach (var category in CategoriesSpentAmount)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        @category.Name
+                                    </div>
+                                    <span><b>@category.Amount</b></span>
+                                    @*<span class="badge bg-primary rounded-pill">@category.Amount</span>*@
+                                </li>
+                            }
+                        </ol>
+                    }
+                    else
+                    {
+                        //TODO: User resources
+                        <div><b>No amount spent</b></div>
+                    }
                 </div>
                 <div class="col-6">
-                <b>Latest transactions and amount</b>
+                    <b>Latest transactions and amount</b>
                     @if (Transactions.Any())
                     {
                         <ol class="list-group list-group-numbered">
@@ -48,13 +61,13 @@
                         </ol>
                     }
                     else
-                    {   //TODO: User resources
-                    <div><b>No transactions to display</b></div>
+                    {
+                        //TODO: User resources
+                        <div><b>No transactions to display</b></div>
                     }
                 </div>
             </div>
-        @*</div>*@
-        
+        }
     </Authorized>
 </AuthorizeView>
 

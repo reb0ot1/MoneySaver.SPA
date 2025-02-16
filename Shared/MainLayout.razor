@@ -1,19 +1,46 @@
-﻿@inherits LayoutComponentBase
+﻿@using MoneySaver.SPA.Exceptions
+@using MoneySaver.SPA.Services
+@inherits LayoutComponentBase
+@inject  NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationServie
+<ErrorBoundary @ref="errorBoundary">
+    <ChildContent>
+    <div class="page">
 
-<div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
 
-    <div class="sidebar">
-        <NavMenu />
+        <main>
+            <div class="top-row px-4 auth">
+                <LoginDisplay />
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
+        </main>
     </div>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        @if (ex.GetType().Name == nameof(UnauthorizedException))
+        {
+            AuthenticationServie.LogoutAsync().GetAwaiter().GetResult();
+            NavigationManager.NavigateTo("login");
+        }
+        else
+        {
+            <h1>Something went wrong. Please refresh your page.</h1>
+        }
+    </ErrorContent>
+</ErrorBoundary>
 
-    <main>
-        <div class="top-row px-4 auth">
-            <LoginDisplay />
-        </div>
-
-        <div class="content px-4">
-            @Body
-        </div>
-    </main>
-</div>
 @* <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script> *@
+
+@code {
+    private ErrorBoundary? errorBoundary;
+    protected override void OnParametersSet()
+    {
+        errorBoundary?.Recover();
+    }
+}

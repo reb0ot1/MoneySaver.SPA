@@ -1,4 +1,5 @@
-﻿using MoneySaver.SPA.Extensions;
+﻿using MoneySaver.SPA.Exceptions;
+using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Response;
 
@@ -15,10 +16,10 @@ namespace MoneySaver.SPA.Services
         }
 
         //TODO: Needs to be refactored. Get only the budget in use. The items gathering should be a different method
-        public async Task<BudgetViewModel> GetBudgetInUseAsync()
+        public async Task<ResponseModel<BudgetViewModel>> GetBudgetInUseAsync()
         {
             var budgetInUse = await this._apiCallsService.GetAsync<BudgetResponseModel>($"{BaseApiPath}/inuse");
-            
+        
             var budgetModel = new BudgetViewModel
             {
                 Id = budgetInUse.Id,
@@ -27,7 +28,7 @@ namespace MoneySaver.SPA.Services
                 IsInUse = budgetInUse.IsInUse
             };
 
-            return budgetModel;
+            return new ResponseModel<BudgetViewModel>() { Data = budgetModel };
         }
 
         public async Task<IEnumerable<BudgetItemModel>> GetBudgetItemsAsync(int budgetId)

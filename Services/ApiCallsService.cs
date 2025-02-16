@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using MoneySaver.SPA.Exceptions;
 using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models.Configurations;
 
@@ -24,7 +25,7 @@ public class ApiCallsService : IApiCallsService
         var response = await this._httpClient.GetAsync(new Uri(this._baseUri, path));
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedException("Unauthorized");
         }
         
         if (response.IsSuccessStatusCode is false)
@@ -47,7 +48,7 @@ public class ApiCallsService : IApiCallsService
         var response = await this._httpClient.PostAsync(new Uri(this._baseUri, path), payload);
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedException("Unauthorized");
         }
         
         if (response.IsSuccessStatusCode is false)
@@ -70,7 +71,7 @@ public class ApiCallsService : IApiCallsService
         var response = await this._httpClient.PutAsync(new Uri(this._baseUri, path), payload);
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            throw new UnauthorizedAccessException();
+            throw new UnauthorizedException("Unauthorized");
         }
         
         if (response.IsSuccessStatusCode is false)

@@ -17,9 +17,6 @@ namespace MoneySaver.SPA.Pages
         [Inject]
         public IBudgetService BudgetService { get; set; }
 
-        [Parameter]
-        public int Id { get; set; }
-
         protected BudgetComponent BudgetComponent { get; set; }
 
         public BudgetViewModel BudgetModel { get; set; }
@@ -35,12 +32,13 @@ namespace MoneySaver.SPA.Pages
             }
 
             var budgetEntity = await BudgetService.GetBudgetInUseAsync();
-           
-            BudgetModel = budgetEntity;
-
+            BudgetModel = budgetEntity.Data;
+            
             StateHasChanged();
-
-            BudgetComponent.ShowComponent = true;
+            if (BudgetModel.IsInUse == true)
+            {
+                BudgetComponent.ShowComponent = BudgetModel.IsInUse;
+            }
         }
 
         //TODO: The method bellow needs to be declare once, because it`s used by other pages.

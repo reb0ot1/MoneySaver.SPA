@@ -1,13 +1,16 @@
 ﻿@if (ShowComponent)
 {
-    <div>Start date: @BudgetComponentModel.StartDate.ToString(Constants.DATE_FORMAT)</div>
-    <div>End date: @BudgetComponentModel.EndDate.ToString(Constants.DATE_FORMAT)</div>
+    @if (BudgetComponentModel is not null)
+    {
+        <div>Start date: @BudgetComponentModel.StartDate.ToString(Constants.DATE_FORMAT)</div>
+        <div>End date: @BudgetComponentModel.EndDate.ToString(Constants.DATE_FORMAT)</div>
+    }
     @if (TransactionCategories.Any())
     {
         <div style="margin:10px 0 10px 0">
             <button @onclick="AddItem" class="btn btn-info table-btn"><i class="fas fa-plus" />Add budget item</button>
 
-            @if (BudgetComponentModel.BudgetItems is not null && !BudgetComponentModel.BudgetItems.Any())
+            @if (BudgetComponentModel?.BudgetItems is not null && !BudgetComponentModel.BudgetItems.Any() && BudgetComponentModel.IsInUse is false)
             {
                 <button @onclick="CopyBudgetInUseItems" style="margin-left:10px" class="btn btn-info table-btn"><i class="fas fa-plus" />Copy budget in use items</button>
             }
@@ -18,12 +21,12 @@
         <div class="alert-info">Please create categories in order to add them to the budget.</div>
     }
 
-    if (this.BudgetComponentModel.BudgetItems is not null && this.BudgetComponentModel.BudgetItems.Any())
+    if (this.BudgetComponentModel?.BudgetItems is not null && this.BudgetComponentModel.BudgetItems.Any())
     {
         <div class="row">
             <div class="col-md-12">
                 <RadzenDataGrid AllowFiltering="false" FilterMode="Radzen.FilterMode.Advanced" AllowPaging="false"
-                    AllowSorting="false" Data="@BudgetComponentModel.BudgetItems" TItem="MoneySaver.SPA.Models.BudgetItemModel" AllowColumnResize="false">
+                                AllowSorting="false" Data="@BudgetComponentModel.BudgetItems" TItem="MoneySaver.SPA.Models.BudgetItemModel" AllowColumnResize="false">
                     <Columns>
                         <RadzenDataGridColumn Width="300px" TItem="MoneySaver.SPA.Models.BudgetItemModel" Property="TransactionCategory" Title="Category" Filterable="false" Sortable="false">
                             <Template Context="data">
@@ -39,7 +42,7 @@
                                          aria-valuenow="@data.Progress"
                                          aria-valuemin="0"
                                          aria-valuemax="100">
-                                     </div>
+                                    </div>
                                 </div>
                             </Template>
                             <FooterTemplate>
@@ -86,9 +89,9 @@
                     </Columns>
                 </RadzenDataGrid>
             </div>
-
-            <BudgetItemDialog @ref="BudgetItemDialog" CloseEventCallback="@AddItem_OnDialogClose" BudgetId="@BudgetComponentModel.Id" ТransactionCategories="@TransactionCategories.ToArray()"></BudgetItemDialog>
-        </div>
+        </div>                   
     }
+    
+    <BudgetItemDialog @ref="BudgetItemDialog" CloseEventCallback="@AddItem_OnDialogClose" BudgetId="@BudgetComponentModel.Id" ТransactionCategories="@TransactionCategories?.ToArray()"></BudgetItemDialog>
 
 }

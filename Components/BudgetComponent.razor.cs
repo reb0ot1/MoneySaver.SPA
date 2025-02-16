@@ -25,18 +25,20 @@ namespace MoneySaver.SPA.Components
 
         protected async override Task OnInitializedAsync()
         {
-            if (this.BudgetModel != null)
+            if (this.BudgetModel is null || this.BudgetModel.Id == 0)
             {
-                this.BudgetComponentModel = new BudgetViewModel
-                {
-                    Id = this.BudgetModel.Id,
-                    StartDate = this.BudgetModel.StartDate,
-                    EndDate = this.BudgetModel.EndDate,
-                    IsInUse = this.BudgetModel.IsInUse
-                };
-
-                await this.UpdateCompoment();
+                return;
             }
+            
+            this.BudgetComponentModel = new BudgetViewModel
+            {
+                Id = this.BudgetModel.Id,
+                StartDate = this.BudgetModel.StartDate,
+                EndDate = this.BudgetModel.EndDate,
+                IsInUse = this.BudgetModel.IsInUse
+            };
+            
+            await this.UpdateCompoment();
         }
 
         protected void AddItem()
@@ -48,7 +50,7 @@ namespace MoneySaver.SPA.Components
         protected async Task CopyBudgetInUseItems()
         {
             var currentlyInUseBudget = await this.BudgetService.GetBudgetInUseAsync();
-            var currentlyInUseBudgetItems = await this.BudgetService.GetBudgetItemsAsync(currentlyInUseBudget.Id);
+            var currentlyInUseBudgetItems = await this.BudgetService.GetBudgetItemsAsync(currentlyInUseBudget.Data.Id);
         
             //TODO: Use bulk request
             foreach (var budgetItem in currentlyInUseBudgetItems)
@@ -113,33 +115,35 @@ namespace MoneySaver.SPA.Components
         private async Task UpdateCompoment()
         {
             var budgetItems = await this.BudgetService.GetBudgetItemsAsync(BudgetModel.Id);
-
-            this.BudgetComponentModel.LimitAmount = budgetItems.Sum(s => s.LimitAmount);
-            this.BudgetComponentModel.TotalSpentAmmount = budgetItems.Sum(s => s.SpentAmount);
-            this.BudgetComponentModel.TotalLeftAmount = this.BudgetComponentModel.LimitAmount - this.BudgetComponentModel.TotalSpentAmmount;
-            var testItems = budgetItems.ToList();
-            foreach (var item in testItems)
-            {
-                if (item == null)
-                {
-                    continue;
-                }
-                var categoryToFind = this.TransactionCategories
-                    .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
-
-
-                item.TransactionCategory = new TransactionCategory { 
-                    AlternativeName = categoryToFind.AlternativeName,
-                    Name = categoryToFind.Name,
-                    TransactionCategoryId = categoryToFind.TransactionCategoryId,
-                    ParentId = categoryToFind.ParentId
-                };
-            }
-
-            this.BudgetComponentModel.BudgetItems = testItems
-                .OrderBy(e => e.TransactionCategory?.AlternativeName)
-                .ToArray();
             
+            if (this.BudgetComponentModel != null)
+            {
+                this.BudgetComponentModel.LimitAmount = budgetItems.Sum(s => s.LimitAmount);
+                this.BudgetComponentModel.TotalSpentAmmount = budgetItems.Sum(s => s.SpentAmount);
+                this.BudgetComponentModel.TotalLeftAmount = this.BudgetComponentModel.LimitAmount - this.BudgetComponentModel.TotalSpentAmmount;
+                var testItems = budgetItems.ToList();
+                foreach (var item in testItems)
+                {
+                    if (item == null)
+                    {
+                        continue;
+                    }
+                    var categoryToFind = this.TransactionCategories
+                        .FirstOrDefault(e => e.TransactionCategoryId == item.TransactionCategoryId);
+
+
+                    item.TransactionCategory = new TransactionCategory { 
+                        AlternativeName = categoryToFind.AlternativeName,
+                        Name = categoryToFind.Name,
+                        TransactionCategoryId = categoryToFind.TransactionCategoryId,
+                        ParentId = categoryToFind.ParentId
+                    };
+                }
+
+                BudgetComponentModel.BudgetItems = testItems
+                    .OrderBy(e => e.TransactionCategory?.AlternativeName)
+                    .ToArray();    
+            }
         }
     }
 }

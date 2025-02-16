@@ -16,22 +16,22 @@ else
 {
     if (ShowBudgets)
     {
-        if (!BudgetsList.Any())
-        {
-            <div><b>No budgets to display</b></div>
-        }
-        else
-        {
-            <div style="margin-bottom:10px">
-                <button @onclick="CreateBudget" class="btn btn-info table-btn"><i class="fas fa-plus" /> Create budget</button>
-            </div>
+        <div style="margin-bottom:10px">
+            <button @onclick="CreateBudget" class="btn btn-info table-btn"><i class="fas fa-plus"/> Create budget</button>
+        </div>
+        <BudgetDialog @ref="BudgetDialog" CloseEventCallback="@OnDialogClose"></BudgetDialog>
+    }
 
-            @*        <button type="button" class="btn btn-info" @onclick="@(() => test_click())">
-            <i class="fas fa-plus"></i>Test click
-        </button>*@
-
+    if (!BudgetsList.Any())
+    {
+        <div><b>No budgets to display</b></div>
+    }
+    else
+    {
+        if (ShowBudgets)
+        {
             <RadzenDataGrid @ref="grid" AllowFiltering="false" AllowPaging="true" PageSize="ItemsPerPage" LoadData="@LoadGridData"
-            AllowSorting="false" Data="@BudgetsList" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" ColumnWidth="200px">
+                            AllowSorting="false" Data="@BudgetsList" Count="@TotalCount" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" ColumnWidth="200px">
                 <Columns>
                     <RadzenDataGridColumn CssClass="col-md-2" TItem="MoneySaver.SPA.Models.Response.BudgetResponseModel" Title="Budget name">
                         <Template Context="data">
@@ -62,12 +62,8 @@ else
                     </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
-
-            <BudgetDialog @ref="BudgetDialog" CloseEventCallback="@OnDialogClose"></BudgetDialog>
         }
-    }
-    @if (this.BudgetModel != null)
-    {
+        
         <BudgetComponent @ref="BudgetComponent" BudgetModel="@this.BudgetModel" TransactionCategories="@this.TransactionCategories"></BudgetComponent>
     }
 }

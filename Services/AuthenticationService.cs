@@ -1,4 +1,5 @@
-﻿using Blazored.LocalStorage;
+﻿using System.Security.Claims;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Options;
 using MoneySaver.SPA.AuthProviders;
@@ -6,6 +7,7 @@ using MoneySaver.SPA.Extensions;
 using MoneySaver.SPA.Models;
 using MoneySaver.SPA.Models.Configurations;
 using System.Text.Json;
+using MoneySaver.SPA.Features;
 
 namespace MoneySaver.SPA.Services
 {
@@ -24,7 +26,6 @@ namespace MoneySaver.SPA.Services
             )
         {
             this._client = client;
-            //this._options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
             this._authStateProvider = authenticationState;
             this._localStorage = localStorageService;
             this._identityAddress = spaSettings.Value.AuthenticationAddress;
@@ -60,11 +61,22 @@ namespace MoneySaver.SPA.Services
         }
 
         public async Task<bool> UserIsLogged()
-        { 
+        {
+
             var token = await this._localStorage.GetItemAsStringAsync("authToken");
+
             if (token == null)
             {
                 return false;
+            }
+
+            var context = await this._authStateProvider.GetAuthenticationStateAsync();
+            var emailClaim = context.User.Claims.FirstOrDefault(e => e.Type == ClaimTypes.Name);
+            
+            if (emailClaim is null)
+            {
+                var emailFromToken = JwtParser.ParseClaimsFromJwt(token).FirstOrDefault(e => e.Type == "email");
+                ((AuthStateProvider)this._authStateProvider).NotifyUserAuthentication(emailFromToken.Value);
             }
 
             return true;

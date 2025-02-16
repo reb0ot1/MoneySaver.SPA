@@ -9,24 +9,13 @@
     </Authorizing>
     <Authorized>
         <div class="row col-12">
-            <div class="col-6">Logged as: @context.User.Claims.Where(e => e.Type == "name" || e.Type ==  ClaimTypes.Name ).FirstOrDefault()?.Value</div>
+            <div class="col-6">Logged as: @context.User.Claims.FirstOrDefault(e => e.Type == ClaimTypes.Email || e.Type == ClaimTypes.Name)?.Value</div>
             <div class="col-6" style="text-align:right">
                 <a href="logout">Log out</a>
             </div>
         </div>
-        
-        @*<button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>*@
     </Authorized>
     <NotAuthorized>
-        @*<a href="authentication/login">Log in</a>*@
         <a href="login">Log in</a>
     </NotAuthorized>
 </AuthorizeView>
-
-@code{
-    //private async Task BeginSignOut(MouseEventArgs args)
-    //{
-    //    await SignOutManager.SetSignOutState();
-    //    Navigation.NavigateTo("authentication/logout");
-    //}
-}

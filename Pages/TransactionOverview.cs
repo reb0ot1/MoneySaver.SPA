@@ -61,6 +61,9 @@ namespace MoneySaver.SPA.Pages
             TransactionDialog.Show();
         }
 
+        protected bool DisableAddTranctionButton
+            => !this.TransactionCategories.Any();
+        
         protected void UpdateTransaction(Guid transactionId)
         {
             TransactionDialog.Show(this.Transactions.FirstOrDefault(f => f.Id == transactionId));

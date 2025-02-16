@@ -15,6 +15,13 @@
 }
 else
 {
+    if (BudgetModel.IsInUse)
+    {
         <BudgetComponent @ref="BudgetComponent" BudgetModel="@BudgetModel" TransactionCategories="@TransactionCategories" ></BudgetComponent>
+    }
+    else
+    {
+        <div class="alert-info">Please create a budget and set it "In use"</div>
+    }
 }
 </div>

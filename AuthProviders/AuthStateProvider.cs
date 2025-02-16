@@ -23,10 +23,11 @@ namespace MoneySaver.SPA.AuthProviders
             var token = await this._localStorage.GetItemAsStringAsync("authToken");
             if (string.IsNullOrWhiteSpace(token))
                 return this._anonymous;
-
+            var claims = JwtParser.ParseClaimsFromJwt(token);
+            var emailClaim = JwtParser.ParseClaimsFromJwt(token).FirstOrDefault(e => e.Type == ClaimTypes.Email);
             this._httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", token);
 
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(JwtParser.ParseClaimsFromJwt(token), "jwtAuthType")));
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims, "jwtAuthType")));
         }
 
         public void NotifyUserAuthentication(string email)

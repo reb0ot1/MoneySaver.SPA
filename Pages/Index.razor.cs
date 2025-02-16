@@ -28,38 +28,42 @@ namespace MoneySaver.SPA.Pages
         [Inject]
         private IReportDataService reportDataService { get; set; }
 
-        [Inject]
-        public AuthenticationStateProvider StateProv { get; set; }
-
         public DateTime StartDate { get; set; }
 
         public DateTime EndDate { get; set; }
 
-        public IEnumerable<TransactionRepresentationModel> Transactions { get; set; } = new List<TransactionRepresentationModel>();
+        public IEnumerable<TransactionRepresentationModel> Transactions { get; set; }
 
-        public IEnumerable<CategoryAmountSpentModel> CategoriesSpentAmount { get; set; } = new List<CategoryAmountSpentModel>();
+        public IEnumerable<CategoryAmountSpentModel> CategoriesSpentAmount { get; set; }
 
         protected async override Task OnInitializedAsync()
         {
             var budgetTask = this.budgetService.GetBudgetInUseAsync();
             var categoriesTask = this.categoryService.GetAllPreparedForVisualizationAsync();
-
+        
             await Task.WhenAll(budgetTask, categoriesTask);
 
             var currentBudget = budgetTask.Result;
+            if (currentBudget.Data.Id != 0)
+            {
+                var budgetItems = await this.budgetService.GetBudgetItemsAsync(currentBudget.Data.Id);
+                currentBudget.Data.BudgetItems = budgetItems.ToArray();
+    
+                this.BudgetModel = currentBudget.Data;
+                this.StartDate = currentBudget.Data.StartDate;
+                this.EndDate = currentBudget.Data.EndDate;
+                var budgetCategoryIds = currentBudget.Data.BudgetItems.Select(e => e.TransactionCategoryId);
+                var categories = categoriesTask.Result;
+                var categoriesBasedOnBudget = categories.Where(w => budgetCategoryIds.Contains(w.TransactionCategoryId)).ToList();
 
-            var budgetItems = await this.budgetService.GetBudgetItemsAsync(currentBudget.Id);
-            currentBudget.BudgetItems = budgetItems.ToArray();
-
-            this.BudgetModel = currentBudget;
-            this.StartDate = currentBudget.StartDate;
-            this.EndDate = currentBudget.EndDate;
-            var budgetCategoryIds = currentBudget.BudgetItems.Select(e => e.TransactionCategoryId);
-            var categories = categoriesTask.Result;
-            var categoriesBasedOnBudget = categories.Where(w => budgetCategoryIds.Contains(w.TransactionCategoryId)).ToList();
-
-            this.InitializeCategories(categoriesBasedOnBudget);
-            this.InitializeTransactions(categories);
+                this.InitializeCategories(categoriesBasedOnBudget);
+                this.InitializeTransactions(categories);
+            }
+            else
+            {
+                this.Transactions = new List<TransactionRepresentationModel>();
+                this.CategoriesSpentAmount = new List<CategoryAmountSpentModel>();
+            }
         }
 
         private async Task InitializeTransactions(IEnumerable<TransactionCategory> categories)
