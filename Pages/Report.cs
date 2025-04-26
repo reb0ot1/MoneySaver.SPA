@@ -75,7 +75,14 @@ namespace MoneySaver.SPA.Pages
             await Task.WhenAll(result, resultLineChart, resultLineChartExpensesByCategory);
             this.Data = result.Result.ToArray();
             this.LineChartData = resultLineChart.Result;
-            this.ExpensesByPeriodForCategoriesChartData = resultLineChartExpensesByCategory.Result;
+            var lineChartResult = resultLineChartExpensesByCategory.Result;
+            foreach (var lineChartSerie in lineChartResult.Series)
+            {
+                var category = this.CategoryRecords.FirstOrDefault(e => e.Name == lineChartSerie.Name);
+                lineChartSerie.Name = category.AlternativeName;
+            }
+
+            this.ExpensesByPeriodForCategoriesChartData = lineChartResult;
         }
     }
 }
