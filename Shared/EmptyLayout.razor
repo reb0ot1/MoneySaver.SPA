@@ -1,7 +1,18 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inherits LayoutComponentBase
+@inject IWebAssemblyHostEnvironment Env
+@inject IConfiguration config
 
 <div class="main">    
     <div class="content px-4">
+        @if (Env.IsDevelopment())
+        {
+            <div class="alert alert-warning" role="alert">
+                <strong>Warning!</strong> This is a development environment. Do not use real data.
+            </div>
+            <H3>@Env.Environment</H3>
+            <H3>@config["SpaSettings:DataApiAddress"]</H3>
+        }
         @Body
     </div>
 </div>

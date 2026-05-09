@@ -34,7 +34,7 @@ namespace MoneySaver.SPA.Services
         {
             var bodyContent = RequestContent.CreateContent(userForAuthenticationDto);
             
-            var authUri = new Uri(new Uri(this._identityAddress), "login");
+            var authUri = new Uri(new Uri(this._identityAddress), "identity/login");
             var authResult = await this._client.PostAsync(authUri, bodyContent);
             var authContent = await authResult.Content.ReadAsStringAsync();
 
@@ -92,7 +92,7 @@ namespace MoneySaver.SPA.Services
         public async Task<ServiceResult<bool>> RegisterUser(UserForRegistration userForRegistration)
         {
             var bodyContent = RequestContent.CreateContent(userForRegistration);
-            var authUri = new Uri(new Uri(this._identityAddress), "register");
+            var authUri = new Uri(new Uri(this._identityAddress), "identity/register");
             var authResult = await this._client.PostAsync(authUri, bodyContent);
             var authContent = await authResult.Content.ReadAsStringAsync();
             if (!authResult.IsSuccessStatusCode)
