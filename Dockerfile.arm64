@@ -1,0 +1,12 @@
+# Build stage runs on the host's native architecture; only the nginx image is arm64.
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY MoneySaver.SPA.csproj .
+RUN dotnet restore MoneySaver.SPA.csproj
+COPY . .
+RUN dotnet publish MoneySaver.SPA.csproj -c Release -o /app/publish
+
+FROM --platform=linux/arm64 nginx:alpine AS final
+WORKDIR /usr/share/nginx/html
+COPY --from=build /app/publish/wwwroot .
+COPY nginx.conf /etc/nginx/nginx.conf
